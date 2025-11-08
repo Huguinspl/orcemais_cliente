@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "gestorfy-app"
+  },
+  "targets": {
+    "gestorfy-app": {
+      "hosting": {
+        "gestorfy-cliente": [
+          "gestorfy-cliente"
+        ]
+      }
+    }
+  }
+}
