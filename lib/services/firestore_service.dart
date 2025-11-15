@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/orcamento.dart';
+import '../models/recibo.dart';
 import '../models/business_info.dart';
 
 class FirestoreService {
@@ -38,17 +39,39 @@ class FirestoreService {
     }
   }
 
+  // Busca recibo específico
+  Future<Recibo?> getRecibo(String userId, String reciboId) async {
+    try {
+      print('🔍 Buscando recibo: business/$userId/recibos/$reciboId');
+
+      DocumentSnapshot doc = await _db
+          .collection('business')
+          .doc(userId)
+          .collection('recibos')
+          .doc(reciboId)
+          .get();
+
+      if (!doc.exists) {
+        print('❌ Recibo não encontrado');
+        return null;
+      }
+
+      Recibo recibo = Recibo.fromFirestore(doc);
+
+      print('✅ Recibo encontrado: #${recibo.numero}');
+      return recibo;
+    } catch (e) {
+      print('❌ Erro ao buscar recibo: $e');
+      rethrow;
+    }
+  }
+
   // Busca informações do negócio
   Future<BusinessInfo?> getBusinessInfo(String userId) async {
     try {
       print('🔍 Buscando dados do negócio: users/$userId/business/info');
 
-      DocumentSnapshot doc = await _db
-          .collection('users')
-          .doc(userId)
-          .collection('meta')
-          .doc('business')
-          .get();
+      DocumentSnapshot doc = await _db.collection('business').doc(userId).get();
 
       if (!doc.exists) {
         print('❌ Dados do negócio não encontrados');

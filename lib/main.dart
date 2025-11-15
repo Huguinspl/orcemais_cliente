@@ -1,8 +1,9 @@
+import 'package:deep_link/services/link_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'dart:html' as html;
 import 'firebase_options.dart';
 import 'pages/visualizar_orcamento_page.dart';
+import 'pages/visualizar_recibo_page.dart';
 import 'pages/erro_page.dart';
 import 'utils/constants.dart';
 
@@ -14,10 +15,127 @@ void main() async {
   runApp(const GestorfyClientApp());
 }
 
-class GestorfyClientApp extends StatelessWidget {
+class GestorfyClientApp extends StatefulWidget {
   const GestorfyClientApp({super.key});
 
-  Map<String, String>? _extrairParametrosUrl() {
+  @override
+  State<GestorfyClientApp> createState() => _GestorfyClientAppState();
+}
+
+class _GestorfyClientAppState extends State<GestorfyClientApp> {
+  String? linkString;
+  Map<String, String>? parametros;
+  bool isLoading = true;
+
+  Future<void> _getLink(String idLink) async {
+    try {
+      final link = await DeepLink.getLink(idLink);
+      print('Deep Link recebido: $link');
+
+      linkString = link.toJson().toString();
+
+      // Extrair userId e orcamentoId do deep link
+      if (link.parametrosPersonalizados?['userId'] != null &&
+          link.parametrosPersonalizados?['orcamentoId'] != null) {
+        parametros = {
+          'userId': link.parametrosPersonalizados!['userId'].toString(),
+          'documentoId': link.parametrosPersonalizados!['documentoId']
+              .toString(),
+          'tipoDocumento':
+              link.parametrosPersonalizados!['tipoDocumento']?.toString() ?? '',
+        };
+
+        print('✅ Parâmetros extraídos: $parametros');
+      } else {
+        print('❌ Deep link não contém userId ou orcamentoId');
+      }
+    } catch (e) {
+      debugPrint('❌ Erro ao buscar deep link: $e');
+      linkString = 'Erro ao carregar link';
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Atualiza a URL no navegador para incluir ?view=app
+    final currentUrl = Uri.base;
+
+    parametros = DeepLink.getQueryParametersFromUri(currentUrl);
+    final idLink = DeepLink.getIdLinkFromUri(currentUrl);
+
+    DeepLink.init(
+      baseUrl: 'https://us-central1-deep-link-hub.cloudfunctions.net',
+      apiToken: 'nLL73gzJdaxyYzlqzhls',
+    );
+
+    _getLink(idLink);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Se ainda está carregando, mostra loading
+    if (isLoading) {
+      return MaterialApp(
+        title: 'Gestorfy - Visualizar Orçamento',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppConstants.primaryColor,
+          ),
+          useMaterial3: true,
+        ),
+        home: const Scaffold(body: Center(child: CircularProgressIndicator())),
+      );
+    }
+
+    return MaterialApp(
+      title: 'Gestorfy - Visualizar Orçamento',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.primaryColor),
+        useMaterial3: true,
+      ),
+      home: parametros != null ? _buildDocumentPage() : _buildErrorPage(),
+    );
+  }
+
+  // Decide qual página mostrar baseado no tipoDocumento
+  Widget _buildDocumentPage() {
+    final tipoDocumento = parametros!['tipoDocumento'] ?? '';
+
+    // Exibir Recibo
+    if (tipoDocumento == 'recibo') {
+      return VisualizarReciboPage(
+        userId: parametros!['userId'],
+        reciboId: parametros!['documentoId'],
+      );
+    }
+
+    // Exibir Orçamento (padrão)
+    return VisualizarOrcamentoPage(
+      userId: parametros!['userId'],
+      orcamentoId: parametros!['documentoId'],
+      tipoDocumento: tipoDocumento,
+    );
+  }
+
+  // Página de erro
+  Widget _buildErrorPage() {
+    return const ErroPage(
+      titulo: 'Link Inválido',
+      mensagem:
+          'O link fornecido não é válido. Verifique se o link está correto e completo.',
+    );
+  }
+}
+
+/* Map<String, String>? _extrairParametrosUrl() {
     try {
       final url = html.window.location.href;
       final uri = Uri.parse(url);
@@ -51,29 +169,4 @@ class GestorfyClientApp extends StatelessWidget {
       print('Erro ao extrair parâmetros da URL: $e');
       return null;
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final parametros = _extrairParametrosUrl();
-
-    return MaterialApp(
-      title: 'Gestorfy - Visualizar Orçamento',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.primaryColor),
-        useMaterial3: true,
-      ),
-      home: parametros != null
-          ? VisualizarOrcamentoPage(
-              userId: parametros['userId'],
-              orcamentoId: parametros['orcamentoId'],
-            )
-          : const ErroPage(
-              titulo: 'Link Inválido',
-              mensagem:
-                  'O link fornecido não é válido. Verifique se o link está correto e completo.',
-            ),
-    );
-  }
-}
+  } */

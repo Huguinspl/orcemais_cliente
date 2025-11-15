@@ -63,6 +63,17 @@
     <div class="spinner"></div>
     <div id="loading-text">Carregando orçamento...</div>
   </div>
+  
+  <script>
+    // Remove loading quando Flutter carregar
+    window.addEventListener('flutter-first-frame', function() {
+      var loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.display = 'none';
+      }
+    });
+  </script>
+  
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

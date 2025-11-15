@@ -1,34 +1,27 @@
 import 'package:flutter/material.dart';
-import '../models/orcamento.dart';
+import '../models/recibo.dart';
 import '../models/business_info.dart';
 import '../services/firestore_service.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/business_header.dart';
-import '../widgets/orcamento_card.dart';
+import '../widgets/recibo_card.dart';
 import '../widgets/item_card.dart';
 import '../utils/formatters.dart';
 import '../utils/constants.dart';
 
-class VisualizarOrcamentoPage extends StatefulWidget {
+class VisualizarReciboPage extends StatefulWidget {
   final String? userId;
-  final String? orcamentoId;
-  final String? tipoDocumento;
+  final String? reciboId;
 
-  const VisualizarOrcamentoPage({
-    super.key,
-    this.userId,
-    this.orcamentoId,
-    this.tipoDocumento,
-  });
+  const VisualizarReciboPage({super.key, this.userId, this.reciboId});
 
   @override
-  State<VisualizarOrcamentoPage> createState() =>
-      _VisualizarOrcamentoPageState();
+  State<VisualizarReciboPage> createState() => _VisualizarReciboPageState();
 }
 
-class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
+class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
   bool _isLoading = true;
-  Orcamento? _orcamento;
+  Recibo? _recibo;
   BusinessInfo? _businessInfo;
   String? _errorMessage;
   final _firestoreService = FirestoreService();
@@ -46,25 +39,25 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     });
 
     try {
-      if (widget.userId == null || widget.orcamentoId == null) {
+      if (widget.userId == null || widget.reciboId == null) {
         throw Exception('Parâmetros inválidos');
       }
 
-      print('📊 Carregando dados...');
+      print('📊 Carregando dados do recibo...');
       print('   userId: ${widget.userId}');
-      print('   orcamentoId: ${widget.orcamentoId}');
+      print('   reciboId: ${widget.reciboId}');
 
       // Buscar dados em paralelo para melhor performance
       final results = await Future.wait([
-        _firestoreService.getOrcamento(widget.userId!, widget.orcamentoId!),
+        _firestoreService.getRecibo(widget.userId!, widget.reciboId!),
         _firestoreService.getBusinessInfo(widget.userId!),
       ]);
 
-      final orcamento = results[0] as Orcamento?;
+      final recibo = results[0] as Recibo?;
       final businessInfo = results[1] as BusinessInfo?;
 
-      if (orcamento == null) {
-        throw Exception('Orçamento não encontrado ou não está disponível');
+      if (recibo == null) {
+        throw Exception('Recibo não encontrado ou não está disponível');
       }
 
       if (businessInfo == null) {
@@ -72,12 +65,12 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       }
 
       setState(() {
-        _orcamento = orcamento;
+        _recibo = recibo;
         _businessInfo = businessInfo;
         _isLoading = false;
       });
 
-      print('✅ Dados carregados com sucesso!');
+      print('✅ Dados do recibo carregados com sucesso!');
     } catch (e) {
       print('❌ Erro ao carregar dados: $e');
       setState(() {
@@ -92,8 +85,8 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
-        title: const Text('Orçamento'),
-        backgroundColor: AppConstants.primaryColor,
+        title: const Text('Recibo'),
+        backgroundColor: AppConstants.successColor,
         foregroundColor: Colors.white,
       ),
       body: _buildBody(),
@@ -102,15 +95,15 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const LoadingWidget(message: 'Carregando orçamento...');
+      return const LoadingWidget(message: 'Carregando recibo...');
     }
 
     if (_errorMessage != null) {
       return _buildErrorWidget();
     }
 
-    if (_orcamento == null || _businessInfo == null) {
-      return const Center(child: Text('Orçamento não encontrado'));
+    if (_recibo == null || _businessInfo == null) {
+      return const Center(child: Text('Recibo não encontrado'));
     }
 
     return SingleChildScrollView(
@@ -125,8 +118,8 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Card do orçamento
-                OrcamentoCard(orcamento: _orcamento!),
+                // Card do recibo
+                ReciboCard(recibo: _recibo!),
 
                 const SizedBox(height: 16),
 
@@ -146,12 +139,16 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 const SizedBox(height: 24),
 
                 // Informações de pagamento
-                if (_orcamento!.metodoPagamento != null)
-                  _buildPagamentoSection(),
+                if (_recibo!.metodoPagamento != null) _buildPagamentoSection(),
+
+                // Observações
+                if (_recibo!.observacoes != null &&
+                    _recibo!.observacoes!.isNotEmpty)
+                  _buildObservacoesSection(),
 
                 // Informações adicionais
-                if (_orcamento!.informacoesAdicionais != null &&
-                    _orcamento!.informacoesAdicionais!.isNotEmpty)
+                if (_recibo!.informacoesAdicionais != null &&
+                    _recibo!.informacoesAdicionais!.isNotEmpty)
                   _buildInfoAdicionaisSection(),
 
                 const SizedBox(height: 32),
@@ -192,7 +189,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   }
 
   Widget _buildClienteSection() {
-    final cliente = _orcamento!.cliente;
+    final cliente = _recibo!.cliente;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -200,7 +197,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Cliente',
+              'Recebido de',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const Divider(),
@@ -224,41 +221,41 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Itens do Orçamento',
+          'Itens do Recibo',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        ...(_orcamento!.itens.map((item) => ItemCard(item: item))),
+        ...(_recibo!.itens.map((item) => ItemCard(item: item))),
       ],
     );
   }
 
   Widget _buildResumoFinanceiro() {
     return Card(
-      color: Colors.blue[50],
+      color: Colors.green[50],
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _buildResumoRow(
               'Subtotal',
-              Formatters.formatCurrency(_orcamento!.subtotal),
+              Formatters.formatCurrency(_recibo!.subtotal),
             ),
-            if (_orcamento!.desconto > 0) ...[
+            if (_recibo!.desconto > 0) ...[
               const SizedBox(height: 8),
               _buildResumoRow(
                 'Desconto',
-                '- ${Formatters.formatCurrency(_orcamento!.desconto)}',
+                '- ${Formatters.formatCurrency(_recibo!.desconto)}',
                 color: AppConstants.successColor,
               ),
             ],
             const Divider(height: 20),
             _buildResumoRow(
-              'VALOR TOTAL',
-              Formatters.formatCurrency(_orcamento!.valorTotal),
+              'VALOR PAGO',
+              Formatters.formatCurrency(_recibo!.valorTotal),
               isBold: true,
               fontSize: 20,
-              color: AppConstants.primaryColor,
+              color: AppConstants.successColor,
             ),
           ],
         ),
@@ -274,13 +271,35 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Forma de Pagamento',
+              'Informações de Pagamento',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const Divider(),
-            _buildInfoRow('Método', _orcamento!.metodoPagamento!),
-            if (_orcamento!.parcelas != null)
-              _buildInfoRow('Parcelamento', '${_orcamento!.parcelas}x'),
+            _buildInfoRow('Método', _recibo!.metodoPagamento!),
+            if (_recibo!.dataPagamento != null)
+              _buildInfoRow(
+                'Data do Pagamento',
+                Formatters.formatDate(_recibo!.dataPagamento!.toDate()),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildObservacoesSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Observações',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
+            Text(_recibo!.observacoes!, style: const TextStyle(fontSize: 14)),
           ],
         ),
       ),
@@ -300,7 +319,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             ),
             const Divider(),
             Text(
-              _orcamento!.informacoesAdicionais!,
+              _recibo!.informacoesAdicionais!,
               style: const TextStyle(fontSize: 14),
             ),
           ],
@@ -332,8 +351,26 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             style: const TextStyle(fontSize: 12),
           ),
           const SizedBox(height: 8),
+          const Divider(),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'RECIBO PAGO',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppConstants.successColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Text(
-            'Emitido em ${Formatters.formatDate(DateTime.now())}',
+            'Emitido em ${Formatters.formatDate(_recibo!.dataCriacao.toDate())}',
             style: TextStyle(fontSize: 11, color: Colors.grey[600]),
           ),
         ],
