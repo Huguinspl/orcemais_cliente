@@ -25,13 +25,7 @@ class FirestoreService {
 
       Orcamento orcamento = Orcamento.fromFirestore(doc);
 
-      // Validar se o orçamento está com status "Enviado"
-      if (orcamento.status != 'Enviado') {
-        print('❌ Orçamento não está disponível (status: ${orcamento.status})');
-        throw Exception('Este orçamento não está disponível para visualização');
-      }
-
-      print('✅ Orçamento encontrado: #${orcamento.numero}');
+      print('✅ Orçamento encontrado com status: ${orcamento.status}');
       return orcamento;
     } catch (e) {
       print('❌ Erro ao buscar orçamento: $e');
@@ -58,7 +52,7 @@ class FirestoreService {
 
       Recibo recibo = Recibo.fromFirestore(doc);
 
-      print('✅ Recibo encontrado: #${recibo.numero}');
+      print('✅ Recibo encontrado com status: ${recibo.status}');
       return recibo;
     } catch (e) {
       print('❌ Erro ao buscar recibo: $e');
