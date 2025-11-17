@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/business_info.dart';
 import '../models/custom_theme.dart';
 import '../utils/formatters.dart';
@@ -91,16 +92,70 @@ class BusinessHeader extends StatelessWidget {
             runSpacing: 12,
             alignment: WrapAlignment.center,
             children: [
-              _buildInfoItem(
-                Icons.phone,
-                Formatters.formatPhone(businessInfo.telefone),
-              ),
+              _buildWhatsAppButton(businessInfo.telefone, businessInfo.nomeEmpresa),
               _buildInfoItem(Icons.email, businessInfo.emailEmpresa),
               if (businessInfo.endereco.isNotEmpty)
                 _buildInfoItem(Icons.location_on, businessInfo.endereco),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildWhatsAppButton(String telefone, String nomeEmpresa) {
+    // Remover formatação para criar o link do WhatsApp
+    final telefoneLimpo = telefone.replaceAll(RegExp(r'[^\d]'), '');
+    final mensagem = Uri.encodeComponent(
+      'Olá! Gostaria de mais informações sobre o orçamento.',
+    );
+    final whatsappUrl = 'https://wa.me/55$telefoneLimpo?text=$mensagem';
+
+    return InkWell(
+      onTap: () async {
+        final uri = Uri.parse(whatsappUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF25D366),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.chat_bubble,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              Formatters.formatPhone(telefone),
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white,
+              size: 12,
+            ),
+          ],
+        ),
       ),
     );
   }
