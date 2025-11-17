@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'pages/visualizar_orcamento_page.dart';
 import 'pages/visualizar_recibo_page.dart';
 import 'pages/erro_page.dart';
+import 'models/custom_theme.dart';
 import 'utils/constants.dart';
 
 void main() async {
@@ -43,6 +44,20 @@ class _GestorfyClientAppState extends State<GestorfyClientApp> {
               .toString(),
           'tipoDocumento':
               link.parametrosPersonalizados!['tipoDocumento']?.toString() ?? '',
+          // Extrair cores personalizadas (ARGB format)
+          'corPrimaria':
+              link.parametrosPersonalizados!['corPrimaria']?.toString() ?? '',
+          'corSecundaria':
+              link.parametrosPersonalizados!['corSecundaria']?.toString() ?? '',
+          'corTerciaria':
+              link.parametrosPersonalizados!['corTerciaria']?.toString() ?? '',
+          'corTextoSecundario':
+              link.parametrosPersonalizados!['corTextoSecundario']
+                  ?.toString() ??
+              '',
+          'corTextoTerciario':
+              link.parametrosPersonalizados!['corTextoTerciario']?.toString() ??
+              '',
         };
 
         print('✅ Parâmetros extraídos: $parametros');
@@ -109,11 +124,17 @@ class _GestorfyClientAppState extends State<GestorfyClientApp> {
   Widget _buildDocumentPage() {
     final tipoDocumento = parametros!['tipoDocumento'] ?? '';
 
+    // Criar tema personalizado com as cores dos parâmetros
+    final customTheme = CustomTheme.fromParameters(parametros!);
+
+    print('🎨 Tema personalizado: $customTheme');
+
     // Exibir Recibo
     if (tipoDocumento == 'recibo') {
       return VisualizarReciboPage(
         userId: parametros!['userId'],
         reciboId: parametros!['documentoId'],
+        customTheme: customTheme,
       );
     }
 
@@ -122,6 +143,7 @@ class _GestorfyClientAppState extends State<GestorfyClientApp> {
       userId: parametros!['userId'],
       orcamentoId: parametros!['documentoId'],
       tipoDocumento: tipoDocumento,
+      customTheme: customTheme,
     );
   }
 

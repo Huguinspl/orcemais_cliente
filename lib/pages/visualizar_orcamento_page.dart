@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/orcamento.dart';
 import '../models/business_info.dart';
+import '../models/custom_theme.dart';
 import '../services/firestore_service.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/business_header.dart';
@@ -13,12 +14,14 @@ class VisualizarOrcamentoPage extends StatefulWidget {
   final String? userId;
   final String? orcamentoId;
   final String? tipoDocumento;
+  final CustomTheme? customTheme;
 
   const VisualizarOrcamentoPage({
     super.key,
     this.userId,
     this.orcamentoId,
     this.tipoDocumento,
+    this.customTheme,
   });
 
   @override
@@ -89,11 +92,15 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Usar tema personalizado ou padrão
+    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
+    final primaryColor = theme.primaryColor;
+
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
         title: const Text('Orçamento'),
-        backgroundColor: AppConstants.primaryColor,
+        backgroundColor: primaryColor,
         foregroundColor: Colors.white,
       ),
       body: _buildBody(),
@@ -113,6 +120,10 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       return const Center(child: Text('Orçamento não encontrado'));
     }
 
+    // Tema personalizado
+    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
+    final primaryColor = theme.primaryColor;
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -125,8 +136,11 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Card do orçamento
-                OrcamentoCard(orcamento: _orcamento!),
+                // Card do orçamento (moderno, sem numeração)
+                OrcamentoCard(
+                  orcamento: _orcamento!,
+                  primaryColor: primaryColor,
+                ),
 
                 const SizedBox(height: 16),
 
@@ -234,8 +248,12 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   }
 
   Widget _buildResumoFinanceiro() {
+    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
+    final primaryColor = theme.primaryColor;
+    final secondaryContainer = theme.secondaryContainerColor;
+
     return Card(
-      color: Colors.blue[50],
+      color: secondaryContainer,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -258,7 +276,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
               Formatters.formatCurrency(_orcamento!.valorTotal),
               isBold: true,
               fontSize: 20,
-              color: AppConstants.primaryColor,
+              color: primaryColor,
             ),
           ],
         ),

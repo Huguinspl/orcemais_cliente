@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/recibo.dart';
 import '../models/business_info.dart';
+import '../models/custom_theme.dart';
 import '../services/firestore_service.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/business_header.dart';
@@ -12,8 +13,14 @@ import '../utils/constants.dart';
 class VisualizarReciboPage extends StatefulWidget {
   final String? userId;
   final String? reciboId;
+  final CustomTheme? customTheme;
 
-  const VisualizarReciboPage({super.key, this.userId, this.reciboId});
+  const VisualizarReciboPage({
+    super.key,
+    this.userId,
+    this.reciboId,
+    this.customTheme,
+  });
 
   @override
   State<VisualizarReciboPage> createState() => _VisualizarReciboPageState();
