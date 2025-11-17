@@ -117,7 +117,10 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
       child: Column(
         children: [
           // Cabeçalho da empresa
-          BusinessHeader(businessInfo: _businessInfo!),
+          BusinessHeader(
+            businessInfo: _businessInfo!,
+            customTheme: widget.customTheme,
+          ),
 
           // Conteúdo principal
           Padding(

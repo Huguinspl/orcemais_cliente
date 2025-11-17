@@ -128,7 +128,10 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       child: Column(
         children: [
           // Cabeçalho da empresa
-          BusinessHeader(businessInfo: _businessInfo!),
+          BusinessHeader(
+            businessInfo: _businessInfo!,
+            customTheme: theme,
+          ),
 
           // Conteúdo principal
           Padding(
