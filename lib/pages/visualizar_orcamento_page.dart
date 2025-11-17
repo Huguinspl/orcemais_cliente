@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/orcamento.dart';
 import '../models/business_info.dart';
 import '../models/custom_theme.dart';
@@ -272,7 +273,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             const SizedBox(height: 16),
             _buildInfoRow('Nome', cliente.nome),
             if (cliente.celular.isNotEmpty)
-              _buildInfoRow('Celular', Formatters.formatPhone(cliente.celular)),
+              _buildWhatsAppRow(cliente.celular, cliente.nome),
             if (cliente.email.isNotEmpty) _buildInfoRow('Email', cliente.email),
             if (cliente.cpfCnpj.isNotEmpty)
               _buildInfoRow(
@@ -461,6 +462,80 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             ),
           ),
           Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWhatsAppRow(String celular, String nomeCliente) {
+    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
+    final primaryColor = theme.primaryColor;
+    
+    // Remover formatação para criar o link do WhatsApp
+    final celularLimpo = celular.replaceAll(RegExp(r'[^\d]'), '');
+    final mensagem = Uri.encodeComponent(
+      'Olá! Vi o orçamento e gostaria de mais informações.',
+    );
+    final whatsappUrl = 'https://wa.me/55$celularLimpo?text=$mensagem';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(
+            width: 100,
+            child: Text(
+              'WhatsApp:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+          ),
+          Expanded(
+            child: InkWell(
+              onTap: () async {
+                final uri = Uri.parse(whatsappUrl);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF25D366).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFF25D366),
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.chat_bubble,
+                      color: Color(0xFF25D366),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      Formatters.formatPhone(celular),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF25D366),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: primaryColor,
+                      size: 14,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
