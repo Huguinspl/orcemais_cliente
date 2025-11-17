@@ -209,18 +209,67 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   }
 
   Widget _buildClienteSection() {
+    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
+    final primaryColor = theme.primaryColor;
+    final tertiaryContainer = theme.tertiaryContainerColor;
+
     final cliente = _orcamento!.cliente;
-    return Card(
+    
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            tertiaryContainer,
+            tertiaryContainer.withOpacity(0.7),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: primaryColor.withOpacity(0.3),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Cliente',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    color: primaryColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'DADOS DO CLIENTE',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
             ),
-            const Divider(),
+            const SizedBox(height: 16),
             _buildInfoRow('Nome', cliente.nome),
             if (cliente.celular.isNotEmpty)
               _buildInfoRow('Celular', Formatters.formatPhone(cliente.celular)),
