@@ -106,7 +106,12 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: _buildBody(),
+      body: Stack(
+        children: [
+          _buildBody(),
+          _buildBottomCard(),
+        ],
+      ),
     );
   }
 
@@ -197,6 +202,9 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
                 // Rodapé
                 _buildFooter(),
+
+                // Espaço para o card fixo inferior
+                const SizedBox(height: 200),
               ],
             ),
           ),
@@ -231,25 +239,17 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   }
 
   Widget _buildClienteSection() {
-    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
-    final primaryColor = theme.primaryColor;
-    final tertiaryContainer = theme.tertiaryContainerColor;
-
     final cliente = _orcamento!.cliente;
 
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [tertiaryContainer, tertiaryContainer.withOpacity(0.7)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: primaryColor.withOpacity(0.3), width: 2),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.1),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -264,33 +264,49 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.15),
+                    color: ModernColors.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.person, color: primaryColor, size: 24),
+                  child: Icon(
+                    Icons.person_outline,
+                    color: ModernColors.primary,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'DADOS DO CLIENTE',
+                const Text(
+                  'Dados do Cliente',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                    letterSpacing: 0.5,
+                    color: ModernColors.primary,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            _buildInfoRow('Nome', cliente.nome),
-            if (cliente.celular.isNotEmpty)
-              _buildInfoRow('Celular', Formatters.formatPhone(cliente.celular)),
-            if (cliente.email.isNotEmpty) _buildInfoRow('Email', cliente.email),
-            if (cliente.cpfCnpj.isNotEmpty)
-              _buildInfoRow(
-                'CPF/CNPJ',
-                Formatters.formatCpfCnpj(cliente.cpfCnpj),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ModernColors.background,
+                borderRadius: BorderRadius.circular(12),
               ),
+              child: Column(
+                children: [
+                  _buildInfoRow('Nome', cliente.nome),
+                  if (cliente.celular.isNotEmpty)
+                    _buildInfoRow(
+                        'Celular', Formatters.formatPhone(cliente.celular)),
+                  if (cliente.email.isNotEmpty)
+                    _buildInfoRow('Email', cliente.email),
+                  if (cliente.cpfCnpj.isNotEmpty)
+                    _buildInfoRow(
+                      'CPF/CNPJ',
+                      Formatters.formatCpfCnpj(cliente.cpfCnpj),
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -298,40 +314,43 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   }
 
   Widget _buildItensSection() {
-    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
-    final primaryColor = theme.primaryColor;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [primaryColor, primaryColor.withOpacity(0.85)],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: primaryColor.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
           child: Row(
             children: [
-              Icon(Icons.list_alt, color: Colors.white, size: 24),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: ModernColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.list_alt,
+                  color: ModernColors.primary,
+                  size: 24,
+                ),
+              ),
               const SizedBox(width: 12),
               const Text(
-                'ITENS DO ORÇAMENTO',
+                'Itens do Orçamento',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
+                  color: ModernColors.primary,
                 ),
               ),
             ],
@@ -752,6 +771,137 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomCard() {
+    final valorTotal = Formatters.formatCurrency(_orcamento!.valorTotal);
+
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Valor Total
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: ModernColors.valoresBackground,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Valor Total',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: ModernColors.valoresText,
+                        ),
+                      ),
+                      Text(
+                        valorTotal,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: ModernColors.valoresText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Botões
+                Row(
+                  children: [
+                    // Botão Recusar
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          // TODO: Implementar lógica de recusar orçamento
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Orçamento recusado'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.close, size: 20),
+                        label: const Text(
+                          'Recusar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          side: const BorderSide(color: Colors.red, width: 2),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Botão Aprovar
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          // TODO: Implementar lógica de aprovar orçamento
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Orçamento aprovado!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.check_circle, size: 20),
+                        label: const Text(
+                          'Aprovar Orçamento',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
