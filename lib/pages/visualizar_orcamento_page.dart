@@ -5,7 +5,6 @@ import '../models/custom_theme.dart';
 import '../services/firestore_service.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/business_header.dart';
-import '../widgets/orcamento_card.dart';
 import '../widgets/item_card.dart';
 import '../utils/formatters.dart';
 import '../utils/constants.dart';
@@ -106,12 +105,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Stack(
-        children: [
-          _buildBody(),
-          _buildBottomCard(),
-        ],
-      ),
+      body: Stack(children: [_buildBody(), _buildBottomCard()]),
     );
   }
 
@@ -130,7 +124,6 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
     // Tema personalizado
     final theme = widget.customTheme ?? CustomTheme.defaultTheme;
-    final primaryColor = theme.primaryColor;
 
     return SingleChildScrollView(
       child: Column(
@@ -144,14 +137,6 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Card do orçamento (moderno, sem numeração)
-                OrcamentoCard(
-                  orcamento: _orcamento!,
-                  primaryColor: primaryColor,
-                ),
-
-                const SizedBox(height: 16),
-
                 // Informações do cliente
                 _buildClienteSection(),
 
@@ -296,7 +281,9 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                   _buildInfoRow('Nome', cliente.nome),
                   if (cliente.celular.isNotEmpty)
                     _buildInfoRow(
-                        'Celular', Formatters.formatPhone(cliente.celular)),
+                      'Celular',
+                      Formatters.formatPhone(cliente.celular),
+                    ),
                   if (cliente.email.isNotEmpty)
                     _buildInfoRow('Email', cliente.email),
                   if (cliente.cpfCnpj.isNotEmpty)

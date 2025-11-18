@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/business_info.dart';
 import '../models/custom_theme.dart';
 import '../utils/formatters.dart';
+import '../utils/modern_colors.dart';
 
 class BusinessHeader extends StatelessWidget {
   final BusinessInfo businessInfo;
@@ -17,27 +18,20 @@ class BusinessHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = customTheme ?? CustomTheme.defaultTheme;
-    final primaryColor = theme.primaryColor;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Center(
       child: Container(
         width: screenWidth * 0.75,
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [primaryColor, primaryColor.withOpacity(0.85)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: primaryColor.withOpacity(0.3),
-              spreadRadius: 2,
-              blurRadius: 10,
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
@@ -48,26 +42,26 @@ class BusinessHeader extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: ModernColors.background,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  border: Border.all(
+                    color: ModernColors.primary.withOpacity(0.1),
+                    width: 2,
+                  ),
                 ),
                 child: CachedNetworkImage(
                   imageUrl: businessInfo.logoUrl!,
-                  height: 70,
+                  height: 80,
                   placeholder: (context, url) => const SizedBox(
-                    height: 70,
-                    width: 70,
+                    height: 80,
+                    width: 80,
                     child: Center(child: CircularProgressIndicator()),
                   ),
-                  errorWidget: (context, url, error) =>
-                      Icon(Icons.business, size: 70, color: primaryColor),
+                  errorWidget: (context, url, error) => Icon(
+                    Icons.business,
+                    size: 80,
+                    color: ModernColors.primary,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -77,7 +71,7 @@ class BusinessHeader extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: ModernColors.primary,
                 letterSpacing: 0.5,
               ),
               textAlign: TextAlign.center,
@@ -85,26 +79,33 @@ class BusinessHeader extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               businessInfo.ramo,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: Colors.white70,
+                color: Colors.grey[600],
                 fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 20),
-            Wrap(
-              spacing: 24,
-              runSpacing: 12,
-              alignment: WrapAlignment.center,
-              children: [
-                _buildWhatsAppButton(
-                  businessInfo.telefone,
-                  businessInfo.nomeEmpresa,
-                ),
-                _buildTextInfo(businessInfo.emailEmpresa),
-                if (businessInfo.endereco.isNotEmpty)
-                  _buildInfoItem(Icons.location_on, businessInfo.endereco),
-              ],
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ModernColors.background,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Wrap(
+                spacing: 24,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildWhatsAppButton(
+                    businessInfo.telefone,
+                    businessInfo.nomeEmpresa,
+                  ),
+                  _buildTextInfo(businessInfo.emailEmpresa),
+                  if (businessInfo.endereco.isNotEmpty)
+                    _buildInfoItem(Icons.location_on, businessInfo.endereco),
+                ],
+              ),
             ),
           ],
         ),
@@ -130,9 +131,9 @@ class BusinessHeader extends StatelessWidget {
       icon: const Icon(Icons.chat_bubble, color: Color(0xFF25D366), size: 18),
       label: Text(
         Formatters.formatPhone(telefone),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
-          color: Colors.white,
+          color: Colors.grey[800],
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -146,9 +147,9 @@ class BusinessHeader extends StatelessWidget {
   Widget _buildTextInfo(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
-        color: Colors.white,
+        color: Colors.grey[800],
         fontWeight: FontWeight.w500,
       ),
     );
@@ -158,14 +159,14 @@ class BusinessHeader extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 18, color: Colors.white),
+        Icon(icon, size: 18, color: ModernColors.primary),
         const SizedBox(width: 6),
         Flexible(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: Colors.white,
+              color: Colors.grey[800],
               fontWeight: FontWeight.w500,
             ),
           ),
