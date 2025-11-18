@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:html' as html;
+import 'package:url_launcher/url_launcher.dart';
 import '../utils/constants.dart';
 
 class ErroPage extends StatelessWidget {
@@ -47,7 +47,13 @@ class ErroPage extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
-                onPressed: () => html.window.location.reload(),
+                onPressed: () {
+                  // Recarrega a página atual
+                  launchUrl(
+                    Uri.parse(Uri.base.toString()),
+                    webOnlyWindowName: '_self',
+                  );
+                },
                 icon: const Icon(Icons.refresh),
                 label: const Text('Tentar Novamente'),
                 style: ElevatedButton.styleFrom(

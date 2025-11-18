@@ -6,16 +6,12 @@ class OrcamentoCard extends StatelessWidget {
   final Orcamento orcamento;
   final Color? primaryColor;
 
-  const OrcamentoCard({
-    super.key,
-    required this.orcamento,
-    this.primaryColor,
-  });
+  const OrcamentoCard({super.key, required this.orcamento, this.primaryColor});
 
   @override
   Widget build(BuildContext context) {
     final color = primaryColor ?? Colors.blue.shade600;
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -69,10 +65,7 @@ class OrcamentoCard extends StatelessWidget {
                       SizedBox(height: 4),
                       Text(
                         'Proposta Comercial',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
                     ],
                   ),
@@ -88,11 +81,7 @@ class OrcamentoCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.check_circle,
-                        color: color,
-                        size: 18,
-                      ),
+                      Icon(Icons.check_circle, color: color, size: 18),
                       const SizedBox(width: 6),
                       Text(
                         orcamento.status,

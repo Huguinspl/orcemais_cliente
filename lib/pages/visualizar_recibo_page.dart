@@ -92,7 +92,12 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       appBar: AppBar(
-        title: const Text('Recibo'),
+        title: const Text(
+          'Recibo',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        toolbarHeight: 80,
         backgroundColor: AppConstants.successColor,
         foregroundColor: Colors.white,
       ),
@@ -161,6 +166,12 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
                     _recibo!.informacoesAdicionais!.isNotEmpty)
                   _buildInfoAdicionaisSection(),
 
+                // Fotos do Recibo
+                if (_recibo!.fotos != null && _recibo!.fotos!.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  _buildFotosSection(),
+                ],
+
                 const SizedBox(height: 32),
 
                 // Rodapé
@@ -204,22 +215,16 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
     final tertiaryContainer = theme.tertiaryContainerColor;
 
     final cliente = _recibo!.cliente;
-    
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            tertiaryContainer,
-            tertiaryContainer.withOpacity(0.7),
-          ],
+          colors: [tertiaryContainer, tertiaryContainer.withOpacity(0.7)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: primaryColor.withOpacity(0.3),
-          width: 2,
-        ),
+        border: Border.all(color: primaryColor.withOpacity(0.3), width: 2),
         boxShadow: [
           BoxShadow(
             color: primaryColor.withOpacity(0.1),
@@ -241,11 +246,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
                     color: primaryColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
-                    Icons.person,
-                    color: primaryColor,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.person, color: primaryColor, size: 24),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -301,11 +302,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.list_alt,
-                color: Colors.white,
-                size: 24,
-              ),
+              Icon(Icons.list_alt, color: Colors.white, size: 24),
               const SizedBox(width: 12),
               const Text(
                 'ITENS DO RECIBO',
@@ -326,34 +323,106 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
   }
 
   Widget _buildResumoFinanceiro() {
-    return Card(
-      color: Colors.green[50],
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildResumoRow(
-              'Subtotal',
-              Formatters.formatCurrency(_recibo!.subtotal),
-            ),
-            if (_recibo!.desconto > 0) ...[
-              const SizedBox(height: 8),
-              _buildResumoRow(
-                'Desconto',
-                '- ${Formatters.formatCurrency(_recibo!.desconto)}',
-                color: AppConstants.successColor,
+    // Calcular custos adicionais dos itens
+    double custosAdicionais = 0.0;
+    for (var item in _recibo!.itens) {
+      final custo = (item['custo'] as num?)?.toDouble() ?? 0.0;
+      custosAdicionais += custo;
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.green[50],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Subtotal
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Subtotal', style: TextStyle(fontSize: 16)),
+              Text(
+                Formatters.formatCurrency(_recibo!.subtotal),
+                style: const TextStyle(fontSize: 16),
               ),
             ],
-            const Divider(height: 20),
-            _buildResumoRow(
-              'VALOR PAGO',
-              Formatters.formatCurrency(_recibo!.valorTotal),
-              isBold: true,
-              fontSize: 20,
-              color: AppConstants.successColor,
+          ),
+
+          // Custos Adicionais
+          if (custosAdicionais > 0) ...[
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Custos Adicionais', style: TextStyle(fontSize: 16)),
+                Text(
+                  Formatters.formatCurrency(custosAdicionais),
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
             ),
           ],
-        ),
+
+          // Desconto
+          if (_recibo!.desconto > 0) ...[
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Desconto', style: TextStyle(fontSize: 16)),
+                Text(
+                  '- ${Formatters.formatCurrency(_recibo!.desconto)}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppConstants.successColor,
+                  ),
+                ),
+              ],
+            ),
+          ],
+
+          // Divisor
+          const SizedBox(height: 16),
+          Divider(color: Colors.grey[400], thickness: 1),
+          const SizedBox(height: 16),
+
+          // Valor Total - GARANTIDO VISÍVEL
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'VALOR PAGO',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+                Text(
+                  Formatters.formatCurrency(_recibo!.valorTotal),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -402,20 +471,96 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
   }
 
   Widget _buildInfoAdicionaisSection() {
+    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
+    final primaryColor = theme.primaryColor;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Informações Adicionais',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Icon(Icons.info_outline, color: primaryColor, size: 20),
+                const SizedBox(width: 8),
+                const Text(
+                  'Informações Adicionais',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
             const Divider(),
             Text(
               _recibo!.informacoesAdicionais!,
               style: const TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFotosSection() {
+    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
+    final primaryColor = theme.primaryColor;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.photo_library, color: primaryColor, size: 20),
+                const SizedBox(width: 8),
+                const Text(
+                  'Fotos do Recibo',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const Divider(),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 1.5,
+              ),
+              itemCount: _recibo!.fotos!.length,
+              itemBuilder: (context, index) {
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    _recibo!.fotos![index],
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey[200],
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.broken_image, size: 40),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -489,36 +634,6 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
           Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
         ],
       ),
-    );
-  }
-
-  Widget _buildResumoRow(
-    String label,
-    String value, {
-    bool isBold = false,
-    double fontSize = 16,
-    Color? color,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            color: color,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            color: color,
-          ),
-        ),
-      ],
     );
   }
 }
