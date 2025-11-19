@@ -35,34 +35,51 @@ class _GestorfyClientAppState extends State<GestorfyClientApp> {
 
       linkString = link.toJson().toString();
 
-      // Extrair userId e orcamentoId do deep link
-      if (link.parametrosPersonalizados?['userId'] != null &&
-          link.parametrosPersonalizados?['orcamentoId'] != null) {
-        parametros = {
-          'userId': link.parametrosPersonalizados!['userId'].toString(),
-          'documentoId': link.parametrosPersonalizados!['documentoId']
-              .toString(),
-          'tipoDocumento':
-              link.parametrosPersonalizados!['tipoDocumento']?.toString() ?? '',
-          // Extrair cores personalizadas (ARGB format)
-          'corPrimaria':
-              link.parametrosPersonalizados!['corPrimaria']?.toString() ?? '',
-          'corSecundaria':
-              link.parametrosPersonalizados!['corSecundaria']?.toString() ?? '',
-          'corTerciaria':
-              link.parametrosPersonalizados!['corTerciaria']?.toString() ?? '',
-          'corTextoSecundario':
-              link.parametrosPersonalizados!['corTextoSecundario']
-                  ?.toString() ??
-              '',
-          'corTextoTerciario':
-              link.parametrosPersonalizados!['corTextoTerciario']?.toString() ??
-              '',
-        };
+      // Extrair userId e documentoId do deep link
+      // 🔄 Suporta tanto 'documentoId' (novo) quanto 'orcamentoId' (legado)
+      if (link.parametrosPersonalizados?['userId'] != null) {
+        // Tentar obter documentoId (novo padrão) ou orcamentoId (compatibilidade)
+        String? docId = link.parametrosPersonalizados!['documentoId']
+            ?.toString();
+        if (docId == null || docId.isEmpty || docId == 'null') {
+          docId = link.parametrosPersonalizados!['orcamentoId']?.toString();
+          print('⚠️ Usando orcamentoId para compatibilidade: $docId');
+        }
 
-        print('✅ Parâmetros extraídos: $parametros');
+        if (docId != null && docId != 'null' && docId.isNotEmpty) {
+          parametros = {
+            'userId': link.parametrosPersonalizados!['userId'].toString(),
+            'documentoId': docId,
+            'tipoDocumento':
+                link.parametrosPersonalizados!['tipoDocumento']?.toString() ??
+                '',
+            // Extrair cores personalizadas (ARGB format)
+            'corPrimaria':
+                link.parametrosPersonalizados!['corPrimaria']?.toString() ?? '',
+            'corSecundaria':
+                link.parametrosPersonalizados!['corSecundaria']?.toString() ??
+                '',
+            'corTerciaria':
+                link.parametrosPersonalizados!['corTerciaria']?.toString() ??
+                '',
+            'corTextoSecundario':
+                link.parametrosPersonalizados!['corTextoSecundario']
+                    ?.toString() ??
+                '',
+            'corTextoTerciario':
+                link.parametrosPersonalizados!['corTextoTerciario']
+                    ?.toString() ??
+                '',
+          };
+
+          print('✅ Parâmetros extraídos: $parametros');
+        } else {
+          print('❌ Deep link não contém documentoId válido');
+          print('📋 Parâmetros recebidos: ${link.parametrosPersonalizados}');
+        }
       } else {
-        print('❌ Deep link não contém userId ou orcamentoId');
+        print('❌ Deep link não contém userId');
+        print('📋 Parâmetros recebidos: ${link.parametrosPersonalizados}');
       }
     } catch (e) {
       debugPrint('❌ Erro ao buscar deep link: $e');
@@ -78,9 +95,23 @@ class _GestorfyClientAppState extends State<GestorfyClientApp> {
   void initState() {
     super.initState();
 
-    // Atualiza a URL no navegador para incluir ?view=app
     final currentUrl = Uri.base;
 
+    // 🔧 Verificar se há parâmetros diretos na URL (modo WebView)
+    if (currentUrl.queryParameters.containsKey('userId') &&
+        currentUrl.queryParameters.containsKey('documentoId')) {
+      print('✅ Usando parâmetros diretos da URL');
+      parametros = currentUrl.queryParameters.map(
+        (key, value) => MapEntry(key, value.toString()),
+      );
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
+    // Caso contrário, usar deep link (modo compartilhamento externo)
+    print('🔗 Usando deep link');
     parametros = DeepLink.getQueryParametersFromUri(currentUrl);
     final idLink = DeepLink.getIdLinkFromUri(currentUrl);
 
