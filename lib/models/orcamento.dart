@@ -59,4 +59,42 @@ class Orcamento {
       fotos: data['fotos'] != null ? List<String>.from(data['fotos']) : null,
     );
   }
+
+  Orcamento copyWith({
+    String? id,
+    int? numero,
+    Cliente? cliente,
+    List<Map<String, dynamic>>? itens,
+    double? subtotal,
+    double? desconto,
+    double? valorTotal,
+    String? status,
+    Timestamp? dataCriacao,
+    String? metodoPagamento,
+    int? parcelas,
+    String? laudoTecnico,
+    String? condicoesContratuais,
+    String? garantia,
+    String? informacoesAdicionais,
+    List<String>? fotos,
+  }) {
+    return Orcamento(
+      id: id ?? this.id,
+      numero: numero ?? this.numero,
+      cliente: cliente ?? this.cliente,
+      itens: itens ?? this.itens,
+      subtotal: subtotal ?? this.subtotal,
+      desconto: desconto ?? this.desconto,
+      valorTotal: valorTotal ?? this.valorTotal,
+      status: status ?? this.status,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+      metodoPagamento: metodoPagamento ?? this.metodoPagamento,
+      parcelas: parcelas ?? this.parcelas,
+      laudoTecnico: laudoTecnico ?? this.laudoTecnico,
+      condicoesContratuais: condicoesContratuais ?? this.condicoesContratuais,
+      garantia: garantia ?? this.garantia,
+      informacoesAdicionais: informacoesAdicionais ?? this.informacoesAdicionais,
+      fotos: fotos ?? this.fotos,
+    );
+  }
 }

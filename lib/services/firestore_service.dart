@@ -80,4 +80,30 @@ class FirestoreService {
       rethrow;
     }
   }
+
+  // Atualiza o status do orçamento
+  Future<void> updateOrcamentoStatus(
+    String userId,
+    String orcamentoId,
+    String novoStatus,
+  ) async {
+    try {
+      print('🔄 Atualizando status do orçamento para: $novoStatus');
+
+      await _db
+          .collection('business')
+          .doc(userId)
+          .collection('orcamentos')
+          .doc(orcamentoId)
+          .update({
+        'status': novoStatus,
+        'dataAtualizacao': FieldValue.serverTimestamp(),
+      });
+
+      print('✅ Status atualizado com sucesso');
+    } catch (e) {
+      print('❌ Erro ao atualizar status: $e');
+      rethrow;
+    }
+  }
 }
