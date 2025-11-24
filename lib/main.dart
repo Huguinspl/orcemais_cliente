@@ -165,7 +165,6 @@ class _GestorfyClientAppState extends State<GestorfyClientApp> {
       return VisualizarReciboPage(
         userId: parametros!['userId'],
         reciboId: parametros!['documentoId'],
-        customTheme: customTheme,
       );
     }
 

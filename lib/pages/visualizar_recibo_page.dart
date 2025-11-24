@@ -1,26 +1,19 @@
 import 'package:flutter/material.dart';
 import '../models/recibo.dart';
 import '../models/business_info.dart';
-import '../models/custom_theme.dart';
 import '../services/firestore_service.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/business_header.dart';
-import '../widgets/recibo_card.dart';
 import '../widgets/item_card.dart';
+import '../utils/modern_colors.dart';
 import '../utils/formatters.dart';
 import '../utils/constants.dart';
 
 class VisualizarReciboPage extends StatefulWidget {
   final String? userId;
   final String? reciboId;
-  final CustomTheme? customTheme;
 
-  const VisualizarReciboPage({
-    super.key,
-    this.userId,
-    this.reciboId,
-    this.customTheme,
-  });
+  const VisualizarReciboPage({super.key, this.userId, this.reciboId});
 
   @override
   State<VisualizarReciboPage> createState() => _VisualizarReciboPageState();
@@ -98,7 +91,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
         ),
         centerTitle: true,
         toolbarHeight: 80,
-        backgroundColor: AppConstants.successColor,
+        backgroundColor: ModernColors.primary,
         foregroundColor: Colors.white,
       ),
       body: _buildBody(),
@@ -122,10 +115,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
       child: Column(
         children: [
           // Cabeçalho da empresa
-          BusinessHeader(
-            businessInfo: _businessInfo!,
-            customTheme: widget.customTheme,
-          ),
+          BusinessHeader(businessInfo: _businessInfo!),
 
           // Conteúdo principal
           Padding(
@@ -133,11 +123,6 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Card do recibo
-                ReciboCard(recibo: _recibo!),
-
-                const SizedBox(height: 16),
-
                 // Informações do cliente
                 _buildClienteSection(),
 
@@ -210,24 +195,26 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
   }
 
   Widget _buildClienteSection() {
-    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
-    final primaryColor = theme.primaryColor;
-    final tertiaryContainer = theme.tertiaryContainerColor;
-
     final cliente = _recibo!.cliente;
 
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [tertiaryContainer, tertiaryContainer.withOpacity(0.7)],
+          colors: [
+            ModernColors.infoBackground,
+            ModernColors.infoBackground.withOpacity(0.7),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: primaryColor.withOpacity(0.3), width: 2),
+        border: Border.all(
+          color: ModernColors.primary.withOpacity(0.3),
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.1),
+            color: ModernColors.primary.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -243,10 +230,14 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.15),
+                    color: ModernColors.primary.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.person, color: primaryColor, size: 24),
+                  child: Icon(
+                    Icons.person,
+                    color: ModernColors.primary,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -254,7 +245,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: primaryColor,
+                    color: ModernColors.primary,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -277,9 +268,6 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
   }
 
   Widget _buildItensSection() {
-    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
-    final primaryColor = theme.primaryColor;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -287,14 +275,17 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [primaryColor, primaryColor.withOpacity(0.85)],
+              colors: [
+                ModernColors.primary,
+                ModernColors.primary.withOpacity(0.85),
+              ],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: primaryColor.withOpacity(0.3),
+                color: ModernColors.primary.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -471,9 +462,6 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
   }
 
   Widget _buildInfoAdicionaisSection() {
-    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
-    final primaryColor = theme.primaryColor;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -482,7 +470,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
           children: [
             Row(
               children: [
-                Icon(Icons.info_outline, color: primaryColor, size: 20),
+                Icon(Icons.info_outline, color: ModernColors.primary, size: 20),
                 const SizedBox(width: 8),
                 const Text(
                   'Informações Adicionais',
@@ -502,9 +490,6 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
   }
 
   Widget _buildFotosSection() {
-    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
-    final primaryColor = theme.primaryColor;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -513,7 +498,11 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
           children: [
             Row(
               children: [
-                Icon(Icons.photo_library, color: primaryColor, size: 20),
+                Icon(
+                  Icons.photo_library,
+                  color: ModernColors.primary,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 const Text(
                   'Fotos do Recibo',
