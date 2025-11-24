@@ -96,9 +96,9 @@ class FirestoreService {
           .collection('orcamentos')
           .doc(orcamentoId)
           .update({
-        'status': novoStatus,
-        'dataAtualizacao': FieldValue.serverTimestamp(),
-      });
+            'status': novoStatus,
+            'dataAtualizacao': FieldValue.serverTimestamp(),
+          });
 
       print('✅ Status atualizado com sucesso');
     } catch (e) {

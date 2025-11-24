@@ -960,11 +960,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Icon(
-                          Icons.close,
-                          color: Color(0xFFEF4444),
-                          size: 20,
-                        ),
+                        Icon(Icons.close, color: Color(0xFFEF4444), size: 20),
                         SizedBox(width: 8),
                         Text(
                           'Recusar',
@@ -1038,9 +1034,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
@@ -1049,10 +1043,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 color: const Color(0xFFEF4444).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
-                Icons.close,
-                color: Color(0xFFEF4444),
-              ),
+              child: const Icon(Icons.close, color: Color(0xFFEF4444)),
             ),
             const SizedBox(width: 12),
             const Expanded(
@@ -1106,9 +1097,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
@@ -1117,10 +1106,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 color: const Color(0xFF10B981).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
-                Icons.check_circle,
-                color: Color(0xFF10B981),
-              ),
+              child: const Icon(Icons.check_circle, color: Color(0xFF10B981)),
             ),
             const SizedBox(width: 12),
             const Expanded(

@@ -93,7 +93,8 @@ class Orcamento {
       laudoTecnico: laudoTecnico ?? this.laudoTecnico,
       condicoesContratuais: condicoesContratuais ?? this.condicoesContratuais,
       garantia: garantia ?? this.garantia,
-      informacoesAdicionais: informacoesAdicionais ?? this.informacoesAdicionais,
+      informacoesAdicionais:
+          informacoesAdicionais ?? this.informacoesAdicionais,
       fotos: fotos ?? this.fotos,
     );
   }
