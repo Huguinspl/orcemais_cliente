@@ -93,22 +93,11 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernColors.background,
-      appBar: AppBar(
-        title: const Text(
-          'Orçamento',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        toolbarHeight: 80,
-        backgroundColor: ModernColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+      backgroundColor: Colors.grey.shade50,
       body: _buildBody(),
       bottomNavigationBar: _isLoading || _orcamento == null
           ? null
-          : _buildBottomBar(),
+          : _buildBottomBar(context),
     );
   }
 
@@ -125,72 +114,194 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       return const Center(child: Text('Orçamento não encontrado'));
     }
 
-    // Tema personalizado
-    final theme = widget.customTheme ?? CustomTheme.defaultTheme;
+    final primaryColor = Color(0xFF1976D2);
 
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Cabeçalho da empresa
-          BusinessHeader(businessInfo: _businessInfo!, customTheme: theme),
+          // Header azul (como no gestorfy)
+          Container(
+            width: double.infinity,
+            color: primaryColor,
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+            child: _buildHeaderWeb(context),
+          ),
 
-          // Conteúdo principal
-          Padding(
-            padding: const EdgeInsets.all(16),
+          // Descrição da empresa (se existir)
+          if (_businessInfo!.descricao != null &&
+              _businessInfo!.descricao!.isNotEmpty) ...[
+            Container(
+              constraints: const BoxConstraints(maxWidth: 900),
+              margin: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Text(
+                _businessInfo!.descricao!,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.grey.shade700,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+
+          // Card único branco com todas as seções
+          Container(
+            constraints: const BoxConstraints(maxWidth: 900),
+            margin: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Informações do cliente
-                _buildClienteSection(),
+                // Dados do Cliente
+                _buildSection(
+                  icon: Icons.person_outline,
+                  title: 'Dados do Cliente',
+                  child: _buildClientInfoWeb(context),
+                ),
+                const Divider(height: 1),
 
-                const SizedBox(height: 24),
+                // Itens do Orçamento
+                _buildSection(
+                  icon: Icons.list_alt,
+                  title: 'Itens do Orçamento',
+                  child: _buildItensListWeb(context),
+                ),
+                const Divider(height: 1),
 
-                // Lista de itens
-                _buildItensSection(),
-
-                const SizedBox(height: 24),
-
-                // Resumo financeiro
-                _buildResumoFinanceiro(),
-
-                const SizedBox(height: 24),
-
-                // Informações de pagamento
-                if (_orcamento!.metodoPagamento != null)
-                  _buildPagamentoSection(),
+                // Forma de Pagamento
+                if (_orcamento!.metodoPagamento != null &&
+                    _orcamento!.metodoPagamento!.isNotEmpty) ...[
+                  _buildSection(
+                    icon: Icons.payment,
+                    title: 'Forma de Pagamento',
+                    child: _buildPagamentoWeb(context),
+                  ),
+                  const Divider(height: 1),
+                ],
 
                 // Laudo Técnico
                 if (_orcamento!.laudoTecnico != null &&
-                    _orcamento!.laudoTecnico!.isNotEmpty)
-                  _buildTextSection('Laudo Técnico', _orcamento!.laudoTecnico!),
-
-                // Garantia
-                if (_orcamento!.garantia != null &&
-                    _orcamento!.garantia!.isNotEmpty)
-                  _buildTextSection('Garantia', _orcamento!.garantia!),
+                    _orcamento!.laudoTecnico!.trim().isNotEmpty) ...[
+                  _buildSection(
+                    icon: Icons.engineering,
+                    title: 'Laudo Técnico',
+                    child: _buildTextContent(_orcamento!.laudoTecnico!),
+                  ),
+                  const Divider(height: 1),
+                ],
 
                 // Condições Contratuais
                 if (_orcamento!.condicoesContratuais != null &&
-                    _orcamento!.condicoesContratuais!.isNotEmpty)
-                  _buildTextSection(
-                    'Condições Contratuais',
-                    _orcamento!.condicoesContratuais!,
+                    _orcamento!.condicoesContratuais!.trim().isNotEmpty) ...[
+                  _buildSection(
+                    icon: Icons.description,
+                    title: 'Condições Contratuais',
+                    child: _buildTextContent(_orcamento!.condicoesContratuais!),
                   ),
+                  const Divider(height: 1),
+                ],
+
+                // Garantia
+                if (_orcamento!.garantia != null &&
+                    _orcamento!.garantia!.trim().isNotEmpty) ...[
+                  _buildSection(
+                    icon: Icons.verified_user,
+                    title: 'Garantia',
+                    child: _buildTextContent(_orcamento!.garantia!),
+                  ),
+                  const Divider(height: 1),
+                ],
+
+                // Informações Adicionais
+                if (_orcamento!.informacoesAdicionais != null &&
+                    _orcamento!.informacoesAdicionais!.trim().isNotEmpty) ...[
+                  _buildSection(
+                    icon: Icons.info_outline,
+                    title: 'Informações Adicionais',
+                    child: _buildTextContent(
+                      _orcamento!.informacoesAdicionais!,
+                    ),
+                  ),
+                  const Divider(height: 1),
+                ],
 
                 // Fotos
-                if (_orcamento!.fotos != null && _orcamento!.fotos!.isNotEmpty)
-                  _buildFotosSection(),
+                if (_orcamento!.fotos != null &&
+                    _orcamento!.fotos!.isNotEmpty) ...[
+                  _buildSection(
+                    icon: Icons.photo_library,
+                    title: 'Fotos',
+                    child: _buildFotosGridWeb(context),
+                  ),
+                  const Divider(height: 1),
+                ],
 
-                // Informações adicionais
-                if (_orcamento!.informacoesAdicionais != null &&
-                    _orcamento!.informacoesAdicionais!.isNotEmpty)
-                  _buildInfoAdicionaisSection(),
+                // Resumo Financeiro (no final, antes da assinatura)
+                _buildSection(
+                  icon: Icons.receipt_long,
+                  title: 'Resumo Financeiro',
+                  child: _buildResumoFinanceiroWeb(context),
+                ),
 
-                const SizedBox(height: 32),
-
-                // Rodapé
-                _buildFooter(),
+                // Assinatura
+                if (_businessInfo!.assinaturaUrl != null &&
+                    _businessInfo!.assinaturaUrl!.isNotEmpty) ...[
+                  const Divider(height: 1),
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: _buildAssinaturaWeb(context),
+                  ),
+                ],
               ],
+            ),
+          ),
+
+          // Footer
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(32),
+            color: Colors.grey.shade100,
+            child: Center(
+              child: Column(
+                children: [
+                  Text(
+                    'Orçamento gerado por',
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _businessInfo!.nomeEmpresa,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -462,12 +573,12 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: ModernColors.pagamentoIcon.withOpacity(0.2),
+                    color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.payment,
-                    color: ModernColors.pagamentoText,
+                    color: Colors.blue,
                     size: 24,
                   ),
                 ),
@@ -477,7 +588,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: ModernColors.pagamentoText,
+                    color: Colors.blue,
                   ),
                 ),
               ],
@@ -491,18 +602,10 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
               ),
               child: Column(
                 children: [
-                  _buildInfoRow(
-                    'Método',
-                    _orcamento!.metodoPagamento!,
-                    color: ModernColors.pagamentoText,
-                  ),
+                  _buildInfoRow('Método', _orcamento!.metodoPagamento!),
                   if (_orcamento!.parcelas != null) ...[
                     const Divider(height: 16),
-                    _buildInfoRow(
-                      'Parcelamento',
-                      '${_orcamento!.parcelas}x',
-                      color: ModernColors.pagamentoText,
-                    ),
+                    _buildInfoRow('Parcelamento', '${_orcamento!.parcelas}x'),
                   ],
                 ],
               ),
@@ -517,7 +620,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16, top: 16),
       decoration: BoxDecoration(
-        color: ModernColors.infoBackground,
+        color: Colors.grey[50],
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -537,12 +640,12 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: ModernColors.infoIcon.withOpacity(0.2),
+                    color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.info_outline,
-                    color: ModernColors.infoText,
+                    color: Colors.blue,
                     size: 24,
                   ),
                 ),
@@ -552,7 +655,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: ModernColors.infoText,
+                    color: Colors.blue,
                   ),
                 ),
               ],
@@ -569,7 +672,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 style: const TextStyle(
                   fontSize: 15,
                   height: 1.6,
-                  color: ModernColors.infoText,
+                  color: Colors.black87,
                 ),
               ),
             ),
@@ -582,40 +685,24 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   Widget _buildTextSection(String title, String content) {
     // Cores modernas por seção
     IconData icon;
-    Color backgroundColor;
-    Color textColor;
-    Color iconBgColor;
-
     switch (title) {
       case 'Laudo Técnico':
         icon = Icons.description;
-        backgroundColor = ModernColors.laudoBackground;
-        textColor = ModernColors.laudoText;
-        iconBgColor = ModernColors.laudoIcon;
         break;
       case 'Garantia':
         icon = Icons.verified_user;
-        backgroundColor = ModernColors.garantiaBackground;
-        textColor = ModernColors.garantiaText;
-        iconBgColor = ModernColors.garantiaIcon;
         break;
       case 'Condições Contratuais':
         icon = Icons.gavel;
-        backgroundColor = ModernColors.contratoBackground;
-        textColor = ModernColors.contratoText;
-        iconBgColor = ModernColors.contratoIcon;
         break;
       default:
         icon = Icons.article;
-        backgroundColor = ModernColors.infoBackground;
-        textColor = ModernColors.infoText;
-        iconBgColor = ModernColors.infoIcon;
     }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: Colors.grey[50],
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -635,19 +722,19 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: iconBgColor.withOpacity(0.2),
+                    color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: textColor, size: 24),
+                  child: Icon(icon, color: Colors.blue, size: 24),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: textColor,
+                      color: Colors.blue,
                     ),
                   ),
                 ),
@@ -662,7 +749,11 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
               ),
               child: Text(
                 content,
-                style: TextStyle(fontSize: 15, height: 1.6, color: textColor),
+                style: const TextStyle(
+                  fontSize: 15,
+                  height: 1.6,
+                  color: Colors.black87,
+                ),
               ),
             ),
           ],
@@ -675,7 +766,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: ModernColors.fotosBackground,
+        color: Colors.grey[50],
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -695,12 +786,12 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: ModernColors.fotosIcon.withOpacity(0.2),
+                    color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
                     Icons.photo_library,
-                    color: ModernColors.fotosText,
+                    color: Colors.blue,
                     size: 24,
                   ),
                 ),
@@ -710,7 +801,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: ModernColors.fotosText,
+                    color: Colors.blue,
                   ),
                 ),
               ],
@@ -854,182 +945,6 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     );
   }
 
-  Widget _buildBottomBar() {
-    return Container(
-      padding: const EdgeInsets.all(20).copyWith(bottom: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 12,
-            offset: const Offset(0, -3),
-          ),
-        ],
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Indicador visual
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            // Total
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    ModernColors.primary.withOpacity(0.1),
-                    ModernColors.primary.withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: ModernColors.primary.withOpacity(0.3),
-                  width: 1.5,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: ModernColors.primary,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.attach_money,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Valor Total',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade800,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    Formatters.formatCurrency(_orcamento!.valorTotal),
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: ModernColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Botões de Ação
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => _recusarOrcamento(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(
-                        color: Color(0xFFEF4444),
-                        width: 2,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.close, color: Color(0xFFEF4444), size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Recusar',
-                          style: TextStyle(
-                            color: Color(0xFFEF4444),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF10B981), Color(0xFF059669)],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF10B981).withOpacity(0.4),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () => _aprovarOrcamento(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            Icons.check_circle,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Aprovar',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _recusarOrcamento() {
     showDialog(
       context: context,
@@ -1155,6 +1070,480 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       ),
     );
   }
+
+  // ==================== CARD FIXO INFERIOR ====================
+
+  Widget _buildBottomBar(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 16,
+        bottom: MediaQuery.of(context).padding.bottom + 16,
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Valor Total
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Color(0xFF1976D2).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'VALOR TOTAL',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1976D2),
+                    ),
+                  ),
+                  Text(
+                    Formatters.formatCurrency(_orcamento!.valorTotal),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1976D2),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Botões
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _recusarOrcamento(),
+                    icon: const Icon(Icons.close, size: 20),
+                    label: const Text(
+                      'Recusar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade400,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _aprovarOrcamento(),
+                    icon: const Icon(Icons.check, size: 20),
+                    label: const Text(
+                      'Aprovar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade500,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== NOVOS MÉTODOS PARA LAYOUT IDÊNTICO ====================
+
+  Widget _buildSection({
+    required IconData icon,
+    required String title,
+    required Widget child,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 24, color: Colors.grey.shade700),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderWeb(BuildContext context) {
+    return Column(
+      children: [
+        // Logo
+        if (_businessInfo!.logoUrl != null &&
+            _businessInfo!.logoUrl!.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            child: Image.network(
+              _businessInfo!.logoUrl!,
+              height: 80,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) =>
+                  const SizedBox.shrink(),
+            ),
+          ),
+
+        // Nome da empresa
+        Text(
+          _businessInfo!.nomeEmpresa,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+
+        const SizedBox(height: 8),
+
+        // Informações de contato
+        if (_businessInfo!.telefone.isNotEmpty)
+          Text(
+            _businessInfo!.telefone,
+            style: const TextStyle(fontSize: 14, color: Colors.white),
+          ),
+
+        if (_businessInfo!.emailEmpresa.isNotEmpty)
+          Text(
+            _businessInfo!.emailEmpresa,
+            style: const TextStyle(fontSize: 14, color: Colors.white),
+          ),
+
+        if (_businessInfo!.endereco.isNotEmpty)
+          Text(
+            _businessInfo!.endereco,
+            style: const TextStyle(fontSize: 14, color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
+
+        if (_businessInfo!.cnpj.isNotEmpty)
+          Text(
+            'CNPJ: ${Formatters.formatCpfCnpj(_businessInfo!.cnpj)}',
+            style: const TextStyle(fontSize: 14, color: Colors.white),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildClientInfoWeb(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildInfoRowWeb('Nome', _orcamento!.cliente.nome),
+        if (_orcamento!.cliente.celular.isNotEmpty)
+          _buildInfoRowWeb('Celular', _orcamento!.cliente.celular),
+        if (_orcamento!.cliente.telefone.isNotEmpty)
+          _buildInfoRowWeb('Telefone', _orcamento!.cliente.telefone),
+        if (_orcamento!.cliente.email.isNotEmpty)
+          _buildInfoRowWeb('Email', _orcamento!.cliente.email),
+      ],
+    );
+  }
+
+  Widget _buildInfoRowWeb(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade600,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItensListWeb(BuildContext context) {
+    return Column(
+      children: List.generate(_orcamento!.itens.length, (index) {
+        final item = _orcamento!.itens[index];
+        return _buildItemWeb(index + 1, item);
+      }),
+    );
+  }
+
+  Widget _buildItemWeb(int numero, Map<String, dynamic> item) {
+    final nome = item['nome'] ?? '---';
+    final descricao = item['descricao'];
+    final quantidade = double.tryParse(item['quantidade'].toString()) ?? 1.0;
+    final preco = double.tryParse(item['preco'].toString()) ?? 0.0;
+    final subtotal = (quantidade * preco).toDouble();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Número
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: Color(0xFF1976D2),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                '$numero',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+
+          // Informações
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nome,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (descricao != null && descricao.toString().isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    descricao.toString(),
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      'Qtd: $quantidade',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      'Unit: ${Formatters.formatCurrency(preco)}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Subtotal
+          Text(
+            Formatters.formatCurrency(subtotal),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1976D2),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPagamentoWeb(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildInfoRowWeb('Método', _orcamento!.metodoPagamento!),
+        if (_orcamento!.parcelas != null)
+          _buildInfoRowWeb('Parcelamento', '${_orcamento!.parcelas}x'),
+      ],
+    );
+  }
+
+  Widget _buildTextContent(String text) {
+    return Text(
+      text,
+      style: TextStyle(fontSize: 15, height: 1.6, color: Colors.grey.shade700),
+    );
+  }
+
+  Widget _buildFotosGridWeb(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.5,
+      ),
+      itemCount: _orcamento!.fotos!.length,
+      itemBuilder: (context, index) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            _orcamento!.fotos![index],
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey[200],
+                child: const Icon(Icons.broken_image, color: Colors.grey),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildResumoFinanceiroWeb(BuildContext context) {
+    return Column(
+      children: [
+        _buildFinanceiroRow('Subtotal', _orcamento!.subtotal),
+        if (_orcamento!.desconto > 0) ...[
+          const SizedBox(height: 8),
+          _buildFinanceiroRow(
+            'Desconto',
+            _orcamento!.desconto,
+            isNegative: true,
+          ),
+        ],
+        const Divider(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'TOTAL',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              Formatters.formatCurrency(_orcamento!.valorTotal),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1976D2),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFinanceiroRow(
+    String label,
+    double valor, {
+    bool isNegative = false,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+        Text(
+          '${isNegative ? '-' : ''}${Formatters.formatCurrency(valor)}',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isNegative ? Colors.red : Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAssinaturaWeb(BuildContext context) {
+    return Column(
+      children: [
+        Image.network(
+          _businessInfo!.assinaturaUrl!,
+          height: 60,
+          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+        ),
+        const SizedBox(height: 12),
+        const Divider(),
+        const SizedBox(height: 8),
+        Text(
+          _businessInfo!.nomeEmpresa,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ==================== FIM DOS NOVOS MÉTODOS ====================
 
   Future<void> _atualizarStatusOrcamento(String novoStatus) async {
     // Mostrar loading
