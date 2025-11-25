@@ -119,58 +119,102 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Header azul (como no gestorfy)
+          // Header com gradiente moderno
           Container(
             width: double.infinity,
-            color: primaryColor,
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF1565C0),
+                  Color(0xFF1976D2),
+                  Color(0xFF1E88E5),
+                ],
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
             child: _buildHeaderWeb(context),
           ),
 
-          // Descrição da empresa (se existir)
+          // Descrição da empresa com design moderno
           if (_businessInfo!.descricao != null &&
               _businessInfo!.descricao!.isNotEmpty) ...[
             Container(
               constraints: const BoxConstraints(maxWidth: 900),
-              margin: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
                   ),
                 ],
-              ),
-              child: Text(
-                _businessInfo!.descricao!,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.grey.shade700,
-                  height: 1.5,
+                border: Border.all(
+                  color: Colors.grey.shade100,
+                  width: 1,
                 ),
-                textAlign: TextAlign.center,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF1976D2).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.info_outline,
+                      color: Color(0xFF1976D2),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      _businessInfo!.descricao!,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.grey.shade700,
+                        height: 1.6,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
 
-          // Card único branco com todas as seções
+          // Card principal com design moderno
           Container(
             constraints: const BoxConstraints(maxWidth: 900),
             margin: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                  spreadRadius: 0,
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 48,
+                  offset: const Offset(0, 16),
+                  spreadRadius: 0,
                 ),
               ],
+              border: Border.all(
+                color: Colors.grey.shade100,
+                width: 1,
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1071,7 +1115,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     );
   }
 
-  // ==================== CARD FIXO INFERIOR ====================
+  // ==================== CARD FIXO INFERIOR MODERNIZADO ====================
 
   Widget _buildBottomBar(BuildContext context) {
     return Container(
@@ -1079,97 +1123,192 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 24,
+            offset: const Offset(0, -4),
+            spreadRadius: 0,
           ),
         ],
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey.shade200,
+            width: 1,
+          ),
+        ),
       ),
       padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 16,
-        bottom: MediaQuery.of(context).padding.bottom + 16,
+        left: 24,
+        right: 24,
+        top: 20,
+        bottom: MediaQuery.of(context).padding.bottom + 20,
       ),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Valor Total
+            // Valor Total com gradiente
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Color(0xFF1976D2).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF1976D2).withOpacity(0.15),
+                    Color(0xFF1976D2).withOpacity(0.08),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Color(0xFF1976D2).withOpacity(0.3),
+                  width: 1.5,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'VALOR TOTAL',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1976D2),
-                    ),
-                  ),
-                  Text(
-                    Formatters.formatCurrency(_orcamento!.valorTotal),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1976D2),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1976D2),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFF1976D2).withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.receipt_long,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'VALOR TOTAL',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1976D2).withOpacity(0.8),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            Formatters.formatCurrency(_orcamento!.valorTotal),
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1976D2),
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            // Botões
+            const SizedBox(height: 18),
+            // Botões modernizados com gradiente
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _recusarOrcamento(),
-                    icon: const Icon(Icons.close, size: 20),
-                    label: const Text(
-                      'Recusar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.red.shade200.withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade400,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    child: ElevatedButton(
+                      onPressed: () => _recusarOrcamento(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade400,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 0,
                       ),
-                      elevation: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.close_rounded, size: 22),
+                          SizedBox(width: 8),
+                          Text(
+                            'Recusar',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _aprovarOrcamento(),
-                    icon: const Icon(Icons.check, size: 20),
-                    label: const Text(
-                      'Aprovar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFF10B981),
+                          Color(0xFF059669),
+                        ],
                       ),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFF10B981).withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade500,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    child: ElevatedButton(
+                      onPressed: () => _aprovarOrcamento(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 0,
                       ),
-                      elevation: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.check_circle_rounded, size: 22),
+                          SizedBox(width: 8),
+                          Text(
+                            'Aprovar',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1189,24 +1328,44 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     required Widget child,
   }) {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 24, color: Colors.grey.shade700),
-              const SizedBox(width: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF1976D2).withOpacity(0.1),
+                      Color(0xFF1976D2).withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  size: 22,
+                  color: Color(0xFF1976D2),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.grey.shade900,
+                    letterSpacing: -0.5,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           child,
         ],
       ),
@@ -1216,58 +1375,123 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   Widget _buildHeaderWeb(BuildContext context) {
     return Column(
       children: [
-        // Logo
+        // Logo com efeito moderno
         if (_businessInfo!.logoUrl != null &&
             _businessInfo!.logoUrl!.isNotEmpty)
           Container(
-            margin: const EdgeInsets.only(bottom: 16),
+            margin: const EdgeInsets.only(bottom: 20),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 2,
+              ),
+            ),
             child: Image.network(
               _businessInfo!.logoUrl!,
-              height: 80,
+              height: 90,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) =>
                   const SizedBox.shrink(),
             ),
           ),
 
-        // Nome da empresa
+        // Nome da empresa com destaque
         Text(
           _businessInfo!.nomeEmpresa,
           style: const TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
+            fontSize: 32,
+            fontWeight: FontWeight.w800,
             color: Colors.white,
+            letterSpacing: -0.5,
+            shadows: [
+              Shadow(
+                color: Colors.black26,
+                offset: Offset(0, 2),
+                blurRadius: 4,
+              ),
+            ],
           ),
           textAlign: TextAlign.center,
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
 
-        // Informações de contato
-        if (_businessInfo!.telefone.isNotEmpty)
-          Text(
-            _businessInfo!.telefone,
-            style: const TextStyle(fontSize: 14, color: Colors.white),
+        // Informações de contato modernizadas
+        Container(
+          margin: const EdgeInsets.only(top: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.2),
+              width: 1,
+            ),
           ),
-
-        if (_businessInfo!.emailEmpresa.isNotEmpty)
-          Text(
-            _businessInfo!.emailEmpresa,
-            style: const TextStyle(fontSize: 14, color: Colors.white),
+          child: Column(
+            children: [
+              if (_businessInfo!.telefone.isNotEmpty)
+                _buildHeaderInfoRow(
+                  Icons.phone,
+                  _businessInfo!.telefone,
+                ),
+              if (_businessInfo!.emailEmpresa.isNotEmpty) ...
+              [
+                if (_businessInfo!.telefone.isNotEmpty)
+                  const SizedBox(height: 8),
+                _buildHeaderInfoRow(
+                  Icons.email,
+                  _businessInfo!.emailEmpresa,
+                ),
+              ],
+              if (_businessInfo!.endereco.isNotEmpty) ...
+              [
+                if (_businessInfo!.telefone.isNotEmpty ||
+                    _businessInfo!.emailEmpresa.isNotEmpty)
+                  const SizedBox(height: 8),
+                _buildHeaderInfoRow(
+                  Icons.location_on,
+                  _businessInfo!.endereco,
+                ),
+              ],
+              if (_businessInfo!.cnpj.isNotEmpty) ...
+              [
+                if (_businessInfo!.telefone.isNotEmpty ||
+                    _businessInfo!.emailEmpresa.isNotEmpty ||
+                    _businessInfo!.endereco.isNotEmpty)
+                  const SizedBox(height: 8),
+                _buildHeaderInfoRow(
+                  Icons.badge,
+                  'CNPJ: ${Formatters.formatCpfCnpj(_businessInfo!.cnpj)}',
+                ),
+              ],
+            ],
           ),
+        ),
+      ],
+    );
+  }
 
-        if (_businessInfo!.endereco.isNotEmpty)
-          Text(
-            _businessInfo!.endereco,
-            style: const TextStyle(fontSize: 14, color: Colors.white),
+  Widget _buildHeaderInfoRow(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: Colors.white.withOpacity(0.9)),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white.withOpacity(0.95),
+              fontWeight: FontWeight.w500,
+            ),
             textAlign: TextAlign.center,
           ),
-
-        if (_businessInfo!.cnpj.isNotEmpty)
-          Text(
-            'CNPJ: ${Formatters.formatCpfCnpj(_businessInfo!.cnpj)}',
-            style: const TextStyle(fontSize: 14, color: Colors.white),
-          ),
+        ),
       ],
     );
   }
@@ -1289,22 +1513,40 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
   Widget _buildInfoRowWeb(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 100,
+          Container(
+            width: 110,
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Text(
               label,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Colors.grey.shade600,
-                fontSize: 14,
+                color: Colors.grey.shade700,
+                fontSize: 13,
               ),
             ),
           ),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade800,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1327,30 +1569,56 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     final subtotal = (quantidade * preco).toDouble();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.grey.shade50,
+            Colors.white,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Número
+          // Número com gradiente
           Container(
-            width: 32,
-            height: 32,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: Color(0xFF1976D2),
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF1565C0),
+                  Color(0xFF1976D2),
+                ],
+              ),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF1976D2).withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Center(
               child: Text(
                 '$numero',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1358,42 +1626,43 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
           ),
           const SizedBox(width: 16),
 
-          // Informações
+          // Informações com melhor tipografia
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   nome,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.grey.shade900,
+                    letterSpacing: -0.3,
                   ),
                 ),
                 if (descricao != null && descricao.toString().isNotEmpty) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     descricao.toString(),
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                      height: 1.4,
+                    ),
                   ),
                 ],
-                const SizedBox(height: 8),
-                Row(
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 8,
                   children: [
-                    Text(
-                      'Qtd: $quantidade',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
+                    _buildItemDetail(
+                      Icons.shopping_cart_outlined,
+                      'Qtd: ${quantidade.toStringAsFixed(quantidade.truncateToDouble() == quantidade ? 0 : 1)}',
                     ),
-                    const SizedBox(width: 16),
-                    Text(
-                      'Unit: ${Formatters.formatCurrency(preco)}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
+                    _buildItemDetail(
+                      Icons.attach_money,
+                      Formatters.formatCurrency(preco),
                     ),
                   ],
                 ),
@@ -1401,17 +1670,62 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             ),
           ),
 
-          // Subtotal
-          Text(
-            Formatters.formatCurrency(subtotal),
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1976D2),
+          const SizedBox(width: 12),
+          // Subtotal com destaque
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Color(0xFF1976D2).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Total',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1976D2).withOpacity(0.7),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  Formatters.formatCurrency(subtotal),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1976D2),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildItemDetail(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: Colors.grey.shade500,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
     );
   }
 
