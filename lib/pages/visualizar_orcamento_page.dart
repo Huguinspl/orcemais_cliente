@@ -154,10 +154,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                     offset: const Offset(0, 8),
                   ),
                 ],
-                border: Border.all(
-                  color: Colors.grey.shade100,
-                  width: 1,
-                ),
+                border: Border.all(color: Colors.grey.shade100, width: 1),
               ),
               child: Row(
                 children: [
@@ -211,10 +208,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                   spreadRadius: 0,
                 ),
               ],
-              border: Border.all(
-                color: Colors.grey.shade100,
-                width: 1,
-              ),
+              border: Border.all(color: Colors.grey.shade100, width: 1),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1129,12 +1123,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             spreadRadius: 0,
           ),
         ],
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey.shade200,
-            width: 1,
-          ),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
       ),
       padding: EdgeInsets.only(
         left: 24,
@@ -1268,10 +1257,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [
-                          Color(0xFF10B981),
-                          Color(0xFF059669),
-                        ],
+                        colors: [Color(0xFF10B981), Color(0xFF059669)],
                       ),
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
@@ -1345,11 +1331,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  icon,
-                  size: 22,
-                  color: Color(0xFF1976D2),
-                ),
+                child: Icon(icon, size: 22, color: Color(0xFF1976D2)),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -1426,39 +1408,24 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-              width: 1,
-            ),
+            border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
           ),
           child: Column(
             children: [
               if (_businessInfo!.telefone.isNotEmpty)
-                _buildHeaderInfoRow(
-                  Icons.phone,
-                  _businessInfo!.telefone,
-                ),
-              if (_businessInfo!.emailEmpresa.isNotEmpty) ...
-              [
+                _buildHeaderInfoRow(Icons.phone, _businessInfo!.telefone),
+              if (_businessInfo!.emailEmpresa.isNotEmpty) ...[
                 if (_businessInfo!.telefone.isNotEmpty)
                   const SizedBox(height: 8),
-                _buildHeaderInfoRow(
-                  Icons.email,
-                  _businessInfo!.emailEmpresa,
-                ),
+                _buildHeaderInfoRow(Icons.email, _businessInfo!.emailEmpresa),
               ],
-              if (_businessInfo!.endereco.isNotEmpty) ...
-              [
+              if (_businessInfo!.endereco.isNotEmpty) ...[
                 if (_businessInfo!.telefone.isNotEmpty ||
                     _businessInfo!.emailEmpresa.isNotEmpty)
                   const SizedBox(height: 8),
-                _buildHeaderInfoRow(
-                  Icons.location_on,
-                  _businessInfo!.endereco,
-                ),
+                _buildHeaderInfoRow(Icons.location_on, _businessInfo!.endereco),
               ],
-              if (_businessInfo!.cnpj.isNotEmpty) ...
-              [
+              if (_businessInfo!.cnpj.isNotEmpty) ...[
                 if (_businessInfo!.telefone.isNotEmpty ||
                     _businessInfo!.emailEmpresa.isNotEmpty ||
                     _businessInfo!.endereco.isNotEmpty)
@@ -1575,10 +1542,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.grey.shade50,
-            Colors.white,
-          ],
+          colors: [Colors.grey.shade50, Colors.white],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade200, width: 1),
@@ -1599,10 +1563,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             height: 40,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Color(0xFF1565C0),
-                  Color(0xFF1976D2),
-                ],
+                colors: [Color(0xFF1565C0), Color(0xFF1976D2)],
               ),
               shape: BoxShape.circle,
               boxShadow: [
@@ -1711,11 +1672,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: Colors.grey.shade500,
-        ),
+        Icon(icon, size: 16, color: Colors.grey.shade500),
         const SizedBox(width: 4),
         Text(
           text,

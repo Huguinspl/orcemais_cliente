@@ -87,11 +87,27 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
       appBar: AppBar(
         title: const Text(
           'Recibo',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
         ),
         centerTitle: true,
         toolbarHeight: 80,
-        backgroundColor: ModernColors.primary,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF1565C0),
+                Color(0xFF1976D2),
+                Color(0xFF1E88E5),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         foregroundColor: Colors.white,
       ),
       body: _buildBody(),
@@ -199,59 +215,64 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            ModernColors.infoBackground,
-            ModernColors.infoBackground.withOpacity(0.7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ModernColors.primary.withOpacity(0.3),
-          width: 2,
+          color: ModernColors.primary.withOpacity(0.15),
+          width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: ModernColors.primary.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 48,
+            offset: const Offset(0, 16),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: ModernColors.primary.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10),
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF1976D2),
+                        Color(0xFF1E88E5),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     Icons.person,
-                    color: ModernColors.primary,
+                    color: Colors.white,
                     size: 24,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Text(
                   'RECEBIDO DE',
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: ModernColors.primary,
-                    letterSpacing: 0.5,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1976D2),
+                    letterSpacing: -0.5,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildInfoRow('Nome', cliente.nome),
             if (cliente.celular.isNotEmpty)
               _buildInfoRow('Celular', Formatters.formatPhone(cliente.celular)),
@@ -271,43 +292,37 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                ModernColors.primary,
-                ModernColors.primary.withOpacity(0.85),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: ModernColors.primary.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 16),
           child: Row(
             children: [
-              Icon(Icons.list_alt, color: Colors.white, size: 24),
-              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF1976D2),
+                      Color(0xFF1E88E5),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.list_alt, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 16),
               const Text(
                 'ITENS DO RECIBO',
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
+                  fontSize: 19,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
         ...(_recibo!.itens.map((item) => ItemCard(item: item))),
       ],
     );
@@ -323,15 +338,27 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Colors.green[50],
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF2E7D32),
+            Color(0xFF388E3C),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
+            color: Color(0xFF2E7D32).withOpacity(0.3),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: 48,
+            offset: const Offset(0, 16),
           ),
         ],
       ),
@@ -342,10 +369,21 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Subtotal', style: TextStyle(fontSize: 16)),
+              Text(
+                'Subtotal',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.9),
+                ),
+              ),
               Text(
                 Formatters.formatCurrency(_recibo!.subtotal),
-                style: const TextStyle(fontSize: 16),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white.withOpacity(0.9),
+                ),
               ),
             ],
           ),
@@ -356,10 +394,21 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Custos Adicionais', style: TextStyle(fontSize: 16)),
+                Text(
+                  'Custos Adicionais',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
                 Text(
                   Formatters.formatCurrency(custosAdicionais),
-                  style: const TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
                 ),
               ],
             ),
@@ -371,12 +420,20 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Desconto', style: TextStyle(fontSize: 16)),
+                Text(
+                  'Desconto',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
                 Text(
                   '- ${Formatters.formatCurrency(_recibo!.desconto)}',
                   style: TextStyle(
                     fontSize: 16,
-                    color: AppConstants.successColor,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -384,30 +441,56 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
           ],
 
           // Divisor
-          const SizedBox(height: 16),
-          Divider(color: Colors.grey[400], thickness: 1),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
+          Container(
+            height: 1,
+            color: Colors.white.withOpacity(0.3),
+          ),
+          const SizedBox(height: 20),
 
           // Valor Total - GARANTIDO VISÍVEL
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'VALOR PAGO',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.check_circle,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'VALOR PAGO',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
                   Formatters.formatCurrency(_recibo!.valorTotal),
                   style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
                   ),
                 ),
               ],
