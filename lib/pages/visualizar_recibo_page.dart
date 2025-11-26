@@ -4,7 +4,6 @@ import '../models/business_info.dart';
 import '../services/firestore_service.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/business_header.dart';
-import '../widgets/item_card.dart';
 import '../utils/modern_colors.dart';
 import '../utils/formatters.dart';
 import '../utils/constants.dart';
@@ -98,11 +97,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color(0xFF1565C0),
-                Color(0xFF1976D2),
-                Color(0xFF1E88E5),
-              ],
+              colors: [Color(0xFF1565C0), Color(0xFF1976D2), Color(0xFF1E88E5)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -245,20 +240,13 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        Color(0xFF1976D2),
-                        Color(0xFF1E88E5),
-                      ],
+                      colors: [Color(0xFF1976D2), Color(0xFF1E88E5)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.person, color: Colors.white, size: 24),
                 ),
                 const SizedBox(width: 16),
                 Text(
@@ -300,10 +288,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      Color(0xFF1976D2),
-                      Color(0xFF1E88E5),
-                    ],
+                    colors: [Color(0xFF1976D2), Color(0xFF1E88E5)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -323,7 +308,167 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
             ],
           ),
         ),
-        ...(_recibo!.itens.map((item) => ItemCard(item: item))),
+        ...List.generate(_recibo!.itens.length, (index) {
+          return _buildItemWeb(index + 1, _recibo!.itens[index]);
+        }),
+      ],
+    );
+  }
+
+  Widget _buildItemWeb(int numero, Map<String, dynamic> item) {
+    final nome = item['nome'] ?? '---';
+    final descricao = item['descricao'];
+    final quantidade = double.tryParse(item['quantidade'].toString()) ?? 1.0;
+    final preco = double.tryParse(item['preco'].toString()) ?? 0.0;
+    final subtotal = (quantidade * preco).toDouble();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.grey.shade50, Colors.white],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Número com gradiente
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1565C0), Color(0xFF1976D2)],
+              ),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF1976D2).withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                '$numero',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+
+          // Informações com melhor tipografia
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nome,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.grey.shade900,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                if (descricao != null && descricao.toString().isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    descricao.toString(),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [
+                    _buildItemDetail(
+                      Icons.shopping_cart_outlined,
+                      'Qtd: ${quantidade.toStringAsFixed(quantidade.truncateToDouble() == quantidade ? 0 : 1)}',
+                    ),
+                    _buildItemDetail(
+                      Icons.attach_money,
+                      Formatters.formatCurrency(preco),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 12),
+          // Subtotal com destaque
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Color(0xFF1976D2).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Total',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1976D2).withOpacity(0.7),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  Formatters.formatCurrency(subtotal),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1976D2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemDetail(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: Colors.grey.shade500),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey.shade600,
+          ),
+        ),
       ],
     );
   }
@@ -345,10 +490,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.grey.shade200,
-              width: 1,
-            ),
+            border: Border.all(color: Colors.grey.shade200, width: 1),
           ),
           child: Column(
             children: [
@@ -429,7 +571,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
             ],
           ),
         ),
-        
+
         const SizedBox(height: 16),
 
         // Card Valor Pago
@@ -437,10 +579,7 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color(0xFF2E7D32),
-                Color(0xFF388E3C),
-              ],
+              colors: [Color(0xFF2E7D32), Color(0xFF388E3C)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

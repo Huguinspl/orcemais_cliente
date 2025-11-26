@@ -94,6 +94,30 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
+      appBar: _isLoading || _orcamento == null
+          ? null
+          : AppBar(
+              title: const Text(
+                'Orçamento',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              centerTitle: true,
+              toolbarHeight: 80,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF1565C0), Color(0xFF1976D2), Color(0xFF1E88E5)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+              foregroundColor: Colors.white,
+            ),
       body: _buildBody(),
       bottomNavigationBar: _isLoading || _orcamento == null
           ? null
@@ -119,22 +143,25 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Header com gradiente moderno
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF1565C0),
-                  Color(0xFF1976D2),
-                  Color(0xFF1E88E5),
+          // Card com dados do negócio
+          Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 900),
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
+              child: _buildBusinessHeader(context),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
-            child: _buildHeaderWeb(context),
           ),
 
           // Descrição da empresa com design moderno
@@ -1354,86 +1381,84 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     );
   }
 
-  Widget _buildHeaderWeb(BuildContext context) {
+  Widget _buildBusinessHeader(BuildContext context) {
     return Column(
       children: [
-        // Logo com efeito moderno
+        // Logo
         if (_businessInfo!.logoUrl != null &&
             _businessInfo!.logoUrl!.isNotEmpty)
           Container(
-            margin: const EdgeInsets.only(bottom: 20),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Color(0xFF1976D2).withOpacity(0.1),
                 width: 2,
               ),
             ),
             child: Image.network(
               _businessInfo!.logoUrl!,
-              height: 90,
+              height: 100,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) =>
-                  const SizedBox.shrink(),
+              errorBuilder: (context, error, stackTrace) => Icon(
+                Icons.business,
+                size: 80,
+                color: Color(0xFF1976D2),
+              ),
             ),
           ),
+        const SizedBox(height: 20),
 
-        // Nome da empresa com destaque
+        // Nome da empresa
         Text(
           _businessInfo!.nomeEmpresa,
           style: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
-            letterSpacing: -0.5,
-            shadows: [
-              Shadow(
-                color: Colors.black26,
-                offset: Offset(0, 2),
-                blurRadius: 4,
-              ),
-            ],
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1976D2),
+            letterSpacing: 0.5,
           ),
           textAlign: TextAlign.center,
         ),
 
-        const SizedBox(height: 12),
+        // Ramo de atividade
+        if (_businessInfo!.ramo.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(
+            _businessInfo!.ramo,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
 
-        // Informações de contato modernizadas
+        const SizedBox(height: 20),
+
+        // Informações de contato
         Container(
-          margin: const EdgeInsets.only(top: 4),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (_businessInfo!.telefone.isNotEmpty)
-                _buildHeaderInfoRow(Icons.phone, _businessInfo!.telefone),
+                _buildInfoRowBusiness(Icons.phone, _businessInfo!.telefone),
               if (_businessInfo!.emailEmpresa.isNotEmpty) ...[
                 if (_businessInfo!.telefone.isNotEmpty)
                   const SizedBox(height: 8),
-                _buildHeaderInfoRow(Icons.email, _businessInfo!.emailEmpresa),
+                _buildInfoRowBusiness(Icons.email, _businessInfo!.emailEmpresa),
               ],
               if (_businessInfo!.endereco.isNotEmpty) ...[
                 if (_businessInfo!.telefone.isNotEmpty ||
                     _businessInfo!.emailEmpresa.isNotEmpty)
                   const SizedBox(height: 8),
-                _buildHeaderInfoRow(Icons.location_on, _businessInfo!.endereco),
-              ],
-              if (_businessInfo!.cnpj.isNotEmpty) ...[
-                if (_businessInfo!.telefone.isNotEmpty ||
-                    _businessInfo!.emailEmpresa.isNotEmpty ||
-                    _businessInfo!.endereco.isNotEmpty)
-                  const SizedBox(height: 8),
-                _buildHeaderInfoRow(
-                  Icons.badge,
-                  'CNPJ: ${Formatters.formatCpfCnpj(_businessInfo!.cnpj)}',
-                ),
+                _buildInfoRowBusiness(Icons.location_on, _businessInfo!.endereco),
               ],
             ],
           ),
@@ -1442,21 +1467,18 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     );
   }
 
-  Widget _buildHeaderInfoRow(IconData icon, String text) {
+  Widget _buildInfoRowBusiness(IconData icon, String text) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: Colors.white.withOpacity(0.9)),
+        Icon(icon, size: 18, color: Colors.grey.shade600),
         const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withOpacity(0.95),
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
