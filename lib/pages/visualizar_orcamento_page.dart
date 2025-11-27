@@ -1000,7 +1000,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
   void _recusarOrcamento() {
     final TextEditingController motivoController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1035,10 +1035,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             const SizedBox(height: 16),
             const Text(
               'Por favor, informe o motivo da recusa:',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -1053,7 +1050,10 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFEF4444),
+                    width: 2,
+                  ),
                 ),
                 contentPadding: const EdgeInsets.all(12),
               ),
@@ -1074,7 +1074,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
           ElevatedButton(
             onPressed: () async {
               final motivo = motivoController.text.trim();
-              
+
               if (motivo.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -1099,7 +1099,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 );
                 return;
               }
-              
+
               Navigator.pop(ctx);
               await _atualizarStatusOrcamento('Recusado', motivoRecusa: motivo);
             },
@@ -1538,7 +1538,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             Image.asset('assets/iconzap-principal.png', width: 18, height: 18),
             const SizedBox(width: 8),
             Text(
-              telefone,
+              Formatters.formatPhone(telefone),
               style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xFF25D366),
@@ -2342,21 +2342,24 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       final nomeCliente = _orcamento!.cliente.nome;
       final numeroOrcamento = _orcamento!.numero;
       final valorTotal = Formatters.formatCurrency(_orcamento!.valorTotal);
-      
-      final mensagem = '✅ *Orçamento Aprovado!*\n\n'
+
+      final mensagem =
+          '✅ *Orçamento Aprovado!*\n\n'
           'Olá! O orçamento #$numeroOrcamento foi aprovado por $nomeCliente.\n\n'
           '💰 Valor: $valorTotal\n\n'
           'Acesse o sistema para mais detalhes.';
 
       // Codificar mensagem para URL
       final mensagemCodificada = Uri.encodeComponent(mensagem);
-      
+
       // Limpar telefone e adicionar código do Brasil
       String numbers = _businessInfo!.telefone.replaceAll(RegExp(r'\D'), '');
-      
+
       // Abrir WhatsApp com mensagem
-      final url = Uri.parse('https://wa.me/55$numbers?text=$mensagemCodificada');
-      
+      final url = Uri.parse(
+        'https://wa.me/55$numbers?text=$mensagemCodificada',
+      );
+
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
@@ -2371,8 +2374,9 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       final nomeCliente = _orcamento!.cliente.nome;
       final numeroOrcamento = _orcamento!.numero;
       final valorTotal = Formatters.formatCurrency(_orcamento!.valorTotal);
-      
-      final mensagem = '❌ *Orçamento Recusado*\n\n'
+
+      final mensagem =
+          '❌ *Orçamento Recusado*\n\n'
           'Olá! O orçamento #$numeroOrcamento foi recusado por $nomeCliente.\n\n'
           '💰 Valor: $valorTotal\n\n'
           '📝 *Motivo da recusa:*\n$motivo\n\n'
@@ -2380,13 +2384,15 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
       // Codificar mensagem para URL
       final mensagemCodificada = Uri.encodeComponent(mensagem);
-      
+
       // Limpar telefone e adicionar código do Brasil
       String numbers = _businessInfo!.telefone.replaceAll(RegExp(r'\D'), '');
-      
+
       // Abrir WhatsApp com mensagem
-      final url = Uri.parse('https://wa.me/55$numbers?text=$mensagemCodificada');
-      
+      final url = Uri.parse(
+        'https://wa.me/55$numbers?text=$mensagemCodificada',
+      );
+
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
@@ -2395,7 +2401,10 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     }
   }
 
-  Future<void> _atualizarStatusOrcamento(String novoStatus, {String? motivoRecusa}) async {
+  Future<void> _atualizarStatusOrcamento(
+    String novoStatus, {
+    String? motivoRecusa,
+  }) async {
     // Mostrar loading
     showDialog(
       context: context,
@@ -2432,7 +2441,9 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       if (_businessInfo != null && _businessInfo!.telefone.isNotEmpty) {
         if (novoStatus == 'Aprovado') {
           await _enviarMensagemAprovacao();
-        } else if (novoStatus == 'Recusado' && motivoRecusa != null && motivoRecusa.isNotEmpty) {
+        } else if (novoStatus == 'Recusado' &&
+            motivoRecusa != null &&
+            motivoRecusa.isNotEmpty) {
           await _enviarMensagemRecusa(motivoRecusa);
         }
       }

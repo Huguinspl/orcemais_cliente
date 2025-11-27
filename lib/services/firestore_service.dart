@@ -95,9 +95,7 @@ class FirestoreService {
           .doc(userId)
           .collection('orcamentos')
           .doc(orcamentoId)
-          .update({
-            'status': novoStatus,
-          });
+          .update({'status': novoStatus});
 
       print('✅ Status atualizado com sucesso');
     } catch (e) {
