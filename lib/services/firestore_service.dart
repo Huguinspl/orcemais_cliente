@@ -97,7 +97,6 @@ class FirestoreService {
           .doc(orcamentoId)
           .update({
             'status': novoStatus,
-            'dataAtualizacao': FieldValue.serverTimestamp(),
           });
 
       print('✅ Status atualizado com sucesso');

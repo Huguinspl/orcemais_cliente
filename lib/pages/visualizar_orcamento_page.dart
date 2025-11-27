@@ -999,6 +999,8 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   }
 
   void _recusarOrcamento() {
+    final TextEditingController motivoController = TextEditingController();
+    
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1022,9 +1024,41 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             ),
           ],
         ),
-        content: const Text(
-          'Tem certeza que deseja recusar este orçamento? Esta ação não poderá ser desfeita.',
-          style: TextStyle(fontSize: 15),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Tem certeza que deseja recusar este orçamento?',
+              style: TextStyle(fontSize: 15),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Por favor, informe o motivo da recusa:',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: motivoController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Ex: Preço acima do esperado, prazo muito longo...',
+                hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
+                ),
+                contentPadding: const EdgeInsets.all(12),
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -1038,9 +1072,36 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              final motivo = motivoController.text.trim();
+              
+              if (motivo.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Row(
+                      children: [
+                        Icon(Icons.warning, color: Colors.white),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Por favor, informe o motivo da recusa',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: Colors.orange,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
+                return;
+              }
+              
               Navigator.pop(ctx);
-              _atualizarStatusOrcamento('Recusado');
+              await _atualizarStatusOrcamento('Recusado', motivoRecusa: motivo);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEF4444),
@@ -2304,7 +2365,37 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     }
   }
 
-  Future<void> _atualizarStatusOrcamento(String novoStatus) async {
+  Future<void> _enviarMensagemRecusa(String motivo) async {
+    try {
+      // Preparar mensagem
+      final nomeCliente = _orcamento!.cliente.nome;
+      final numeroOrcamento = _orcamento!.numero;
+      final valorTotal = Formatters.formatCurrency(_orcamento!.valorTotal);
+      
+      final mensagem = '❌ *Orçamento Recusado*\n\n'
+          'Olá! O orçamento #$numeroOrcamento foi recusado por $nomeCliente.\n\n'
+          '💰 Valor: $valorTotal\n\n'
+          '📝 *Motivo da recusa:*\n$motivo\n\n'
+          'Acesse o sistema para mais detalhes.';
+
+      // Codificar mensagem para URL
+      final mensagemCodificada = Uri.encodeComponent(mensagem);
+      
+      // Limpar telefone e adicionar código do Brasil
+      String numbers = _businessInfo!.telefone.replaceAll(RegExp(r'\D'), '');
+      
+      // Abrir WhatsApp com mensagem
+      final url = Uri.parse('https://wa.me/55$numbers?text=$mensagemCodificada');
+      
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      print('Erro ao enviar mensagem WhatsApp: $e');
+    }
+  }
+
+  Future<void> _atualizarStatusOrcamento(String novoStatus, {String? motivoRecusa}) async {
     // Mostrar loading
     showDialog(
       context: context,
@@ -2337,9 +2428,13 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       // Fechar loading
       if (mounted) Navigator.pop(context);
 
-      // Enviar mensagem WhatsApp se for aprovado
-      if (novoStatus == 'Aprovado' && _businessInfo != null && _businessInfo!.telefone.isNotEmpty) {
-        await _enviarMensagemAprovacao();
+      // Enviar mensagem WhatsApp conforme o status
+      if (_businessInfo != null && _businessInfo!.telefone.isNotEmpty) {
+        if (novoStatus == 'Aprovado') {
+          await _enviarMensagemAprovacao();
+        } else if (novoStatus == 'Recusado' && motivoRecusa != null && motivoRecusa.isNotEmpty) {
+          await _enviarMensagemRecusa(motivoRecusa);
+        }
       }
 
       // Mostrar mensagem de sucesso
