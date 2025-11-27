@@ -2275,6 +2275,35 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
   // ==================== FIM DOS NOVOS MÉTODOS ====================
 
+  Future<void> _enviarMensagemAprovacao() async {
+    try {
+      // Preparar mensagem
+      final nomeCliente = _orcamento!.cliente.nome;
+      final numeroOrcamento = _orcamento!.numero;
+      final valorTotal = Formatters.formatCurrency(_orcamento!.valorTotal);
+      
+      final mensagem = '✅ *Orçamento Aprovado!*\n\n'
+          'Olá! O orçamento #$numeroOrcamento foi aprovado por $nomeCliente.\n\n'
+          '💰 Valor: $valorTotal\n\n'
+          'Acesse o sistema para mais detalhes.';
+
+      // Codificar mensagem para URL
+      final mensagemCodificada = Uri.encodeComponent(mensagem);
+      
+      // Limpar telefone e adicionar código do Brasil
+      String numbers = _businessInfo!.telefone.replaceAll(RegExp(r'\D'), '');
+      
+      // Abrir WhatsApp com mensagem
+      final url = Uri.parse('https://wa.me/55$numbers?text=$mensagemCodificada');
+      
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      print('Erro ao enviar mensagem WhatsApp: $e');
+    }
+  }
+
   Future<void> _atualizarStatusOrcamento(String novoStatus) async {
     // Mostrar loading
     showDialog(
@@ -2307,6 +2336,11 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
       // Fechar loading
       if (mounted) Navigator.pop(context);
+
+      // Enviar mensagem WhatsApp se for aprovado
+      if (novoStatus == 'Aprovado' && _businessInfo != null && _businessInfo!.telefone.isNotEmpty) {
+        await _enviarMensagemAprovacao();
+      }
 
       // Mostrar mensagem de sucesso
       if (mounted) {
