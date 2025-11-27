@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/orcamento.dart';
 import '../models/business_info.dart';
 import '../models/custom_theme.dart';
@@ -93,7 +94,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Colors.grey.shade100,
       appBar: _isLoading || _orcamento == null
           ? null
           : AppBar(
@@ -187,33 +188,14 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 ],
                 border: Border.all(color: Colors.grey.shade100, width: 1),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF1976D2).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.info_outline,
-                      color: Color(0xFF1976D2),
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      _businessInfo!.descricao!,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.grey.shade700,
-                        height: 1.6,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                ],
+              child: Text(
+                _businessInfo!.descricao!,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.grey.shade700,
+                  height: 1.6,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
           ],
@@ -329,9 +311,11 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
                 ],
 
                 // Resumo Financeiro (no final, antes da assinatura)
-                _buildSection(
-                  icon: Icons.receipt_long,
-                  title: 'Resumo Financeiro',
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 24,
+                    horizontal: 24,
+                  ),
                   child: _buildResumoFinanceiroWeb(context),
                 ),
 
@@ -1449,14 +1433,24 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (_businessInfo!.telefone.isNotEmpty)
-                _buildInfoRowBusiness(Icons.phone, _businessInfo!.telefone),
-              if (_businessInfo!.emailEmpresa.isNotEmpty) ...[
+                _buildClickablePhone(_businessInfo!.telefone),
+              if (_businessInfo!.cnpj.isNotEmpty) ...[
                 if (_businessInfo!.telefone.isNotEmpty)
+                  const SizedBox(height: 8),
+                _buildInfoRowBusiness(
+                  Icons.badge_outlined,
+                  Formatters.formatCpfCnpj(_businessInfo!.cnpj),
+                ),
+              ],
+              if (_businessInfo!.emailEmpresa.isNotEmpty) ...[
+                if (_businessInfo!.telefone.isNotEmpty ||
+                    _businessInfo!.cnpj.isNotEmpty)
                   const SizedBox(height: 8),
                 _buildInfoRowBusiness(Icons.email, _businessInfo!.emailEmpresa),
               ],
               if (_businessInfo!.endereco.isNotEmpty) ...[
                 if (_businessInfo!.telefone.isNotEmpty ||
+                    _businessInfo!.cnpj.isNotEmpty ||
                     _businessInfo!.emailEmpresa.isNotEmpty)
                   const SizedBox(height: 8),
                 _buildInfoRowBusiness(
@@ -1469,6 +1463,42 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         ),
       ],
     );
+  }
+
+  Widget _buildClickablePhone(String telefone) {
+    return InkWell(
+      onTap: () => _abrirWhatsApp(telefone),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/iconzap-principal.png', width: 18, height: 18),
+            const SizedBox(width: 8),
+            Text(
+              telefone,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF25D366),
+                fontWeight: FontWeight.w600,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.open_in_new, size: 14, color: Color(0xFF25D366)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _abrirWhatsApp(String telefone) async {
+    String numbers = telefone.replaceAll(RegExp(r'\D'), '');
+    final url = Uri.parse('https://wa.me/55$numbers');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
   }
 
   Widget _buildInfoRowBusiness(IconData icon, String text) {
@@ -1970,36 +2000,229 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   }
 
   Widget _buildResumoFinanceiroWeb(BuildContext context) {
-    return Column(
-      children: [
-        _buildFinanceiroRow('Subtotal', _orcamento!.subtotal),
-        if (_orcamento!.desconto > 0) ...[
-          const SizedBox(height: 8),
-          _buildFinanceiroRow(
-            'Desconto',
-            _orcamento!.desconto,
-            isNegative: true,
-          ),
-        ],
-        const Divider(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'TOTAL',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              Formatters.formatCurrency(_orcamento!.valorTotal),
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1976D2),
+    // Calcular custos adicionais
+    double custoTotal = 0.0;
+    for (var item in _orcamento!.itens) {
+      final custo = double.tryParse(item['custo']?.toString() ?? '0') ?? 0.0;
+      custoTotal += custo;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50, // Fundo cinza claro igual à página
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+      ),
+      child: Column(
+        children: [
+          // Cabeçalho
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF1976D2).withOpacity(0.08),
+                  const Color(0xFF1976D2).withOpacity(0.04),
+                ],
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
               ),
             ),
-          ],
-        ),
-      ],
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1976D2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.receipt_long,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  'Resumo Financeiro',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1976D2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Conteúdo
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Subtotal
+                _buildFinanceiroRowCard(
+                  'Subtotal',
+                  _orcamento!.subtotal,
+                  Icons.calculate_outlined,
+                  Colors.grey.shade700,
+                ),
+
+                // Custos Adicionais (se houver)
+                if (custoTotal > 0) ...[
+                  const SizedBox(height: 10),
+                  _buildFinanceiroRowCard(
+                    'Custos Adicionais',
+                    custoTotal,
+                    Icons.build_outlined,
+                    Colors.grey.shade700,
+                  ),
+                ],
+
+                // Desconto (se houver)
+                if (_orcamento!.desconto > 0) ...[
+                  const SizedBox(height: 10),
+                  _buildFinanceiroRowCard(
+                    'Desconto',
+                    _orcamento!.desconto,
+                    Icons.local_offer_outlined,
+                    Colors.red.shade600,
+                    isNegative: true,
+                  ),
+                ],
+
+                const SizedBox(height: 12),
+                Divider(color: Colors.grey.shade300, thickness: 1),
+                const SizedBox(height: 12),
+
+                // Total destacado
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFF1976D2).withOpacity(0.12),
+                        const Color(0xFF1976D2).withOpacity(0.06),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: const Color(0xFF1976D2).withOpacity(0.3),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1976D2),
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFF1976D2,
+                                    ).withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.attach_money,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            const Flexible(
+                              child: Text(
+                                'VALOR TOTAL',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF1976D2),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Flexible(
+                        child: Text(
+                          Formatters.formatCurrency(_orcamento!.valorTotal),
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF1976D2),
+                            letterSpacing: -0.5,
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinanceiroRowCard(
+    String label,
+    double valor,
+    IconData icon,
+    Color cor, {
+    bool isNegative = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: cor),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: cor,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            '${isNegative ? '-' : ''}${Formatters.formatCurrency(valor)}',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: isNegative ? Colors.red.shade600 : Colors.grey.shade900,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
