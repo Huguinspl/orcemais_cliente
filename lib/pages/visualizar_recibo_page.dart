@@ -323,129 +323,123 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
     final subtotal = (quantidade * preco).toDouble();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.grey.shade50, Colors.white],
-        ),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade200, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Número com gradiente
+          // Cabeçalho do item
           Container(
-            width: 40,
-            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1565C0), Color(0xFF1976D2)],
+              color: Color(0xFF1976D2).withOpacity(0.05),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
               ),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0xFF1976D2).withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+            ),
+            child: Row(
+              children: [
+                // Número do item
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1976D2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$numero',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Nome do item
+                Expanded(
+                  child: Text(
+                    nome,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.grey.shade900,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+                // Subtotal destacado
+                Text(
+                  Formatters.formatCurrency(subtotal),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1976D2),
+                  ),
                 ),
               ],
             ),
-            child: Center(
-              child: Text(
-                '$numero',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
           ),
-          const SizedBox(width: 16),
 
-          // Informações com melhor tipografia
-          Expanded(
+          // Conteúdo do item
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  nome,
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.grey.shade900,
-                    letterSpacing: -0.3,
-                  ),
-                ),
+                // Descrição (se existir)
                 if (descricao != null && descricao.toString().isNotEmpty) ...[
-                  const SizedBox(height: 6),
                   Text(
                     descricao.toString(),
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey.shade600,
-                      height: 1.4,
+                      height: 1.5,
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  Divider(color: Colors.grey.shade200, height: 1),
+                  const SizedBox(height: 16),
                 ],
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 8,
+
+                // Detalhes organizados em grid
+                Row(
                   children: [
-                    _buildItemDetail(
-                      Icons.shopping_cart_outlined,
-                      'Qtd: ${quantidade.toStringAsFixed(quantidade.truncateToDouble() == quantidade ? 0 : 1)}',
+                    // Quantidade
+                    Expanded(
+                      child: _buildInfoBox(
+                        label: 'Quantidade',
+                        value: quantidade.toStringAsFixed(
+                          quantidade.truncateToDouble() == quantidade ? 0 : 2,
+                        ),
+                        icon: Icons.inventory_2_outlined,
+                      ),
                     ),
-                    _buildItemDetail(
-                      Icons.attach_money,
-                      Formatters.formatCurrency(preco),
+                    const SizedBox(width: 12),
+                    // Preço unitário
+                    Expanded(
+                      child: _buildInfoBox(
+                        label: 'Preço Unit.',
+                        value: Formatters.formatCurrency(preco),
+                        icon: Icons.payments_outlined,
+                      ),
                     ),
                   ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 12),
-          // Subtotal com destaque
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Color(0xFF1976D2).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'Total',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1976D2).withOpacity(0.7),
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  Formatters.formatCurrency(subtotal),
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1976D2),
-                  ),
                 ),
               ],
             ),
@@ -455,21 +449,46 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
     );
   }
 
-  Widget _buildItemDetail(IconData icon, String text) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16, color: Colors.grey.shade500),
-        const SizedBox(width: 4),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey.shade600,
+  Widget _buildInfoBox({
+    required String label,
+    required String value,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: Colors.grey.shade600),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: Colors.grey.shade900,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
