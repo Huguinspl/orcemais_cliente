@@ -1953,7 +1953,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Total do Item',
+                  'Total dos Itens',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
