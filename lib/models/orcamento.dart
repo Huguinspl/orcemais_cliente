@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'cliente.dart';
 
 class Orcamento {
@@ -42,8 +42,13 @@ class Orcamento {
 
   factory Orcamento.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Orcamento.fromMap(doc.id, data);
+  }
+
+  //  NOVO: Factory para criar a partir de um Map (usado pelo snapshot)
+  factory Orcamento.fromMap(String id, Map<String, dynamic> data) {
     return Orcamento(
-      id: doc.id,
+      id: data['id'] ?? id,
       numero: data['numero'] ?? 0,
       cliente: Cliente.fromMap(data['cliente'] ?? {}),
       itens: List<Map<String, dynamic>>.from(data['itens'] ?? []),

@@ -50,15 +50,46 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     });
 
     try {
-      if (widget.userId == null || widget.orcamentoId == null) {
+      if (widget.orcamentoId == null) {
+        throw Exception('ID do orçamento não informado');
+      }
+
+      print('Carregando dados...');
+      print('   orcamentoId: ${widget.orcamentoId}');
+
+      // OTIMIZAÇÃO: Tenta primeiro buscar do snapshot (1 leitura rápida)
+      final snapshot = await _firestoreService.getSharedDocument(widget.orcamentoId!);
+
+      if (snapshot != null) {
+        // Snapshot encontrado! Carregamento ultrarrápido
+        print('Carregamento rápido via snapshot!');
+
+        final orcamentoData = snapshot['orcamento'] as Map<String, dynamic>;
+        final businessData = snapshot['businessInfo'] as Map<String, dynamic>;
+        final businessInfo = BusinessInfo.fromMap(businessData);
+        
+        // Pré-carrega a logo em paralelo para evitar delay visual
+        if (businessInfo.logoUrl != null && businessInfo.logoUrl!.isNotEmpty && mounted) {
+          precacheImage(NetworkImage(businessInfo.logoUrl!), context);
+        }
+
+        setState(() {
+          _orcamento = Orcamento.fromMap(widget.orcamentoId!, orcamentoData);
+          _businessInfo = businessInfo;
+          _isLoading = false;
+        });
+
+        print('Dados carregados via snapshot!');
+        return;
+      }
+
+      // Fallback: busca tradicional (2 leituras) para links antigos
+      print('Usando fallback tradicional...');
+
+      if (widget.userId == null) {
         throw Exception('Parâmetros inválidos');
       }
 
-      print('📊 Carregando dados...');
-      print('   userId: ${widget.userId}');
-      print('   orcamentoId: ${widget.orcamentoId}');
-
-      // Buscar dados em paralelo para melhor performance
       final results = await Future.wait([
         _firestoreService.getOrcamento(widget.userId!, widget.orcamentoId!),
         _firestoreService.getBusinessInfo(widget.userId!),
@@ -75,21 +106,28 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         throw Exception('Dados da empresa não encontrados');
       }
 
+      // Pré-carrega a logo em paralelo para evitar delay visual
+      if (businessInfo.logoUrl != null && businessInfo.logoUrl!.isNotEmpty && mounted) {
+        precacheImage(NetworkImage(businessInfo.logoUrl!), context);
+      }
+
       setState(() {
         _orcamento = orcamento;
         _businessInfo = businessInfo;
         _isLoading = false;
       });
 
-      print('✅ Dados carregados com sucesso!');
+      print('Dados carregados com sucesso!');
     } catch (e) {
-      print('❌ Erro ao carregar dados: $e');
+      print('Erro ao carregar dados: $e');
       setState(() {
         _errorMessage = e.toString().replaceAll('Exception: ', '');
         _isLoading = false;
       });
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -2369,7 +2407,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
       final mensagem =
           '✅ *Orçamento Aprovado!*\n\n'
-          'Olá! O orçamento #$numeroOrcamento foi aprovado por $nomeCliente.\n\n'
+          'Olá! O orçamento foi aprovado por $nomeCliente.\n\n'
           '💰 Valor: $valorTotal\n\n'
           'Acesse o sistema para mais detalhes.';
 
@@ -2401,7 +2439,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
       final mensagem =
           '❌ *Orçamento Recusado*\n\n'
-          'Olá! O orçamento #$numeroOrcamento foi recusado por $nomeCliente.\n\n'
+          'Olá! O orçamento foi recusado por $nomeCliente.\n\n'
           '💰 Valor: $valorTotal\n\n'
           '📝 *Motivo da recusa:*\n$motivo\n\n'
           'Acesse o sistema para mais detalhes.';
