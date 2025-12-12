@@ -2467,19 +2467,6 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     String novoStatus, {
     String? motivoRecusa,
   }) async {
-    // Mostrar loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black26,
-      useRootNavigator: true,
-      builder: (ctx) => const Center(
-        child: CircularProgressIndicator(
-          color: Colors.white,
-        ),
-      ),
-    );
-
     try {
       // Atualizar status no Firestore
       await _firestoreService.updateOrcamentoStatus(
@@ -2487,12 +2474,6 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         widget.orcamentoId!,
         novoStatus,
       );
-
-      // Fechar loading
-      if (mounted) Navigator.pop(context);
-
-      // Pequeno delay para garantir transição suave antes de abrir WhatsApp
-      await Future.delayed(const Duration(milliseconds: 200));
 
       // Enviar mensagem WhatsApp conforme o status
       if (_businessInfo != null && _businessInfo!.telefone.isNotEmpty) {
@@ -2546,9 +2527,6 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         });
       }
     } catch (e) {
-      // Fechar loading
-      if (mounted) Navigator.pop(context);
-
       // Mostrar erro
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
