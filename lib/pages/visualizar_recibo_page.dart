@@ -38,15 +38,46 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
     });
 
     try {
-      if (widget.userId == null || widget.reciboId == null) {
+      if (widget.reciboId == null) {
+        throw Exception('ID do recibo não informado');
+      }
+
+      print('Carregando dados do recibo...');
+      print('   reciboId: ${widget.reciboId}');
+
+      // OTIMIZAÇÃO: Tenta primeiro buscar do snapshot (1 leitura rápida)
+      final snapshot = await _firestoreService.getSharedDocument(widget.reciboId!);
+
+      if (snapshot != null && snapshot['tipoDocumento'] == 'recibo') {
+        // Snapshot encontrado! Carregamento ultrarrápido
+        print('Carregamento rápido via snapshot!');
+
+        final reciboData = snapshot['recibo'] as Map<String, dynamic>;
+        final businessData = snapshot['businessInfo'] as Map<String, dynamic>;
+        final businessInfo = BusinessInfo.fromMap(businessData);
+        
+        // Pré-carrega a logo em paralelo para evitar delay visual
+        if (businessInfo.logoUrl != null && businessInfo.logoUrl!.isNotEmpty && mounted) {
+          precacheImage(NetworkImage(businessInfo.logoUrl!), context);
+        }
+
+        setState(() {
+          _recibo = Recibo.fromMap(reciboData, id: widget.reciboId);
+          _businessInfo = businessInfo;
+          _isLoading = false;
+        });
+
+        print('Dados carregados via snapshot!');
+        return;
+      }
+
+      // Fallback: busca tradicional (2 leituras) para links antigos
+      print('Usando fallback tradicional...');
+
+      if (widget.userId == null) {
         throw Exception('Parâmetros inválidos');
       }
 
-      print('📊 Carregando dados do recibo...');
-      print('   userId: ${widget.userId}');
-      print('   reciboId: ${widget.reciboId}');
-
-      // Buscar dados em paralelo para melhor performance
       final results = await Future.wait([
         _firestoreService.getRecibo(widget.userId!, widget.reciboId!),
         _firestoreService.getBusinessInfo(widget.userId!),
@@ -63,21 +94,28 @@ class _VisualizarReciboPageState extends State<VisualizarReciboPage> {
         throw Exception('Dados da empresa não encontrados');
       }
 
+      // Pré-carrega a logo em paralelo para evitar delay visual
+      if (businessInfo.logoUrl != null && businessInfo.logoUrl!.isNotEmpty && mounted) {
+        precacheImage(NetworkImage(businessInfo.logoUrl!), context);
+      }
+
       setState(() {
         _recibo = recibo;
         _businessInfo = businessInfo;
         _isLoading = false;
       });
 
-      print('✅ Dados do recibo carregados com sucesso!');
+      print('Dados carregados com sucesso!');
     } catch (e) {
-      print('❌ Erro ao carregar dados: $e');
+      print('Erro ao carregar dados: $e');
       setState(() {
         _errorMessage = e.toString().replaceAll('Exception: ', '');
         _isLoading = false;
       });
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
