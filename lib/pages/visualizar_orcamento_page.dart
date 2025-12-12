@@ -2471,9 +2471,12 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.transparent,
+      barrierColor: Colors.black26,
+      useRootNavigator: true,
       builder: (ctx) => const Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(
+          color: Colors.white,
+        ),
       ),
     );
 
@@ -2487,6 +2490,9 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
       // Fechar loading
       if (mounted) Navigator.pop(context);
+
+      // Pequeno delay para garantir transição suave antes de abrir WhatsApp
+      await Future.delayed(const Duration(milliseconds: 200));
 
       // Enviar mensagem WhatsApp conforme o status
       if (_businessInfo != null && _businessInfo!.telefone.isNotEmpty) {
