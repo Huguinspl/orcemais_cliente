@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:html' as html;
 import 'package:url_launcher/url_launcher.dart';
 import '../models/orcamento.dart';
 import '../models/business_info.dart';
@@ -1599,9 +1600,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   Future<void> _abrirWhatsApp(String telefone) async {
     String numbers = telefone.replaceAll(RegExp(r'\D'), '');
     final url = Uri.parse('https://wa.me/55$numbers');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, webOnlyWindowName: '_blank');
-    }
+    html.window.open(url.toString(), '_blank');
   }
 
   Widget _buildInfoRowBusiness(IconData icon, String text) {
@@ -2426,9 +2425,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         'https://wa.me/55$numbers?text=$mensagemCodificada',
       );
 
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, webOnlyWindowName: '_blank');
-      }
+      html.window.open(url.toString(), '_blank');
     } catch (e) {
       print('Erro ao enviar mensagem WhatsApp: $e');
     }
@@ -2459,9 +2456,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
         'https://wa.me/55$numbers?text=$mensagemCodificada',
       );
 
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, webOnlyWindowName: '_blank');
-      }
+      html.window.open(url.toString(), '_blank');
     } catch (e) {
       print('Erro ao enviar mensagem WhatsApp: $e');
     }
