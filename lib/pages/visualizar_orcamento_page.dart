@@ -1596,7 +1596,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     String numbers = telefone.replaceAll(RegExp(r'\D'), '');
     final url = Uri.parse('https://wa.me/55$numbers');
     if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
+      await launchUrl(url, webOnlyWindowName: '_blank');
     }
   }
 
@@ -2423,7 +2423,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       );
 
       if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
+        await launchUrl(url, webOnlyWindowName: '_blank');
       }
     } catch (e) {
       print('Erro ao enviar mensagem WhatsApp: $e');
@@ -2456,7 +2456,7 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
       );
 
       if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
+        await launchUrl(url, webOnlyWindowName: '_blank');
       }
     } catch (e) {
       print('Erro ao enviar mensagem WhatsApp: $e');
