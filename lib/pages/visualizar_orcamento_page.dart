@@ -2467,43 +2467,13 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
     String novoStatus, {
     String? motivoRecusa,
   }) async {
-        // Mostrar loading com fundo transparente
+    // Mostrar loading
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black54,
-      builder: (ctx) => PopScope(
-        canPop: false,
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text(
-                  'Atualizando status...',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      barrierColor: Colors.transparent,
+      builder: (ctx) => const Center(
+        child: CircularProgressIndicator(),
       ),
     );
 
