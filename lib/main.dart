@@ -135,6 +135,9 @@ class _GestorfyClientAppState extends State<GestorfyClientApp> {
             seedColor: AppConstants.primaryColor,
           ),
           useMaterial3: true,
+          scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+          dialogBackgroundColor: Colors.white,
+          canvasColor: Colors.white,
         ),
         home: const Scaffold(body: Center(child: CircularProgressIndicator())),
       );
@@ -146,6 +149,9 @@ class _GestorfyClientAppState extends State<GestorfyClientApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.primaryColor),
         useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+        dialogBackgroundColor: Colors.white,
+        canvasColor: Colors.white,
       ),
       home: parametros != null ? _buildDocumentPage() : _buildErrorPage(),
     );
