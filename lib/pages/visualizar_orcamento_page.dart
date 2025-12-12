@@ -1041,7 +1041,9 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
 
     showDialog(
       context: context,
+      barrierColor: Colors.black45,
       builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
@@ -1163,7 +1165,9 @@ class _VisualizarOrcamentoPageState extends State<VisualizarOrcamentoPage> {
   void _aprovarOrcamento() {
     showDialog(
       context: context,
+      barrierColor: Colors.black45,
       builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
